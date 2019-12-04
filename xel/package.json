@@ -1,0 +1,77 @@
+{
+  "_from": "xel@0.0.213",
+  "_id": "xel@0.0.213",
+  "_inBundle": false,
+  "_integrity": "sha512-jqkhTeELWLn381VqXaCYtQ7sC1wyq7TDH1H5Si7ixTk7RTq3Z20axAPATit7OuAOngxlB8N4t4cw8xLVSydJ2A==",
+  "_location": "/xel",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "xel@0.0.213",
+    "name": "xel",
+    "escapedName": "xel",
+    "rawSpec": "0.0.213",
+    "saveSpec": null,
+    "fetchSpec": "0.0.213"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/xel/-/xel-0.0.213.tgz",
+  "_shasum": "d5a46a6ba1495ba92ebb864277b21fc024b3df04",
+  "_spec": "xel@0.0.213",
+  "_where": "/home/bruno/Desktop/Projects/appdock-me/electron",
+  "author": {
+    "name": "Jarosław Foksa"
+  },
+  "bugs": {
+    "url": "https://github.com/jarek-foksa/xel/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "Widget toolkit for building native-like Electron, NW.js and Chrome apps",
+  "devDependencies": {
+    "fs-extra": "7.0.1",
+    "prismjs": "1.16.0",
+    "rollup": "1.9.0"
+  },
+  "homepage": "https://xel-toolkit.org/",
+  "keywords": [
+    "material",
+    "design",
+    "widget",
+    "toolkit",
+    "electron",
+    "nwjs",
+    "nw.js",
+    "macOS",
+    "desktop",
+    "ui",
+    "button",
+    "slider",
+    "tabs",
+    "card",
+    "menu",
+    "menubar",
+    "checkbox",
+    "radio",
+    "switch",
+    "select",
+    "dialog",
+    "drawer",
+    "popover",
+    "slider",
+    "throbber"
+  ],
+  "license": "MIT",
+  "name": "xel",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jarek-foksa/xel.git"
+  },
+  "scripts": {
+    "start": "firebase serve --only hosting"
+  },
+  "version": "0.0.213"
+}

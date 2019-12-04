@@ -1,0 +1,45 @@
+{
+    "name": "Appdock",
+    "version": "1.0.0",
+    "description": "AppDock | Engine Native App Creator",
+    "email": "xbrunots@gmail.com",
+    "main": "app.js",
+    "scripts": {
+        "start": "electron app.js",
+        "dist": "electron-builder --linux snap",
+        "appimage": "electron-builder --linux appimage"
+    },
+    "devDependencies": {
+        "electron": "^3.0.2",
+        "electron-builder": "^21.2.0",
+        "electron-packager": "^14.1.1",
+        "ember-cli-materialize": "^0.22.0"
+    },
+    "dependencies": {
+        "@simonwep/pickr": "^1.4.7",
+        "asar": "^2.0.1",
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.19.0",
+        "connect": "^3.7.0",
+        "cookie-parser": "^1.4.4",
+        "debug": "~2.6.3",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "firebase-admin": "8.6.1",
+        "firebase-functions": "0.7.0",
+        "jade": "~1.11.0",
+        "jsonwebtoken": "^8.2.1",
+        "morgan": "^1.9.1",
+        "mysql": "^2.17.1",
+        "papaparse": "^4.6.0",
+        "qr-image": "^3.2.0",
+        "serve-favicon": "~2.4.2",
+        "serve-static": "^1.14.1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "ssh://git@kamino.deploy.umbler.com:9922/kqxlz75e/appdock-me.git"
+    },
+    "author": "Bruno Brito",
+    "license": "ISC"
+}
