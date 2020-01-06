@@ -5,11 +5,11 @@ NODE_ENV = 'debug'
 PASSWORD = 'pwdHmg'
 BYPASS_TOKEN = true
 
-MYSQL_HOST = 'mysql669.umbler.com'
-MYSQL_DEBUG_PORT = 41890
-MYSQL_USER = 'appdock_user'
+MYSQL_HOST = 'db4free.net'
+MYSQL_DEBUG_PORT = 3306
+MYSQL_USER = 'appdock'
 MYSQL_PASSWORD = 'ana010118'
-MYSQL_DB = 'appdock_db'
+MYSQL_DB = 'appdock'
 
 
 TABLES_HOST = 'mysql669.umbler.com'
@@ -27,6 +27,7 @@ SECRET = 'zdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhd
 var prod = mysql.createPool({
     host: MYSQL_HOST,
     user: MYSQL_USER,
+    port: MYSQL_DEBUG_PORT,
     password: MYSQL_PASSWORD,
     database: MYSQL_DB,
     multipleStatements: true

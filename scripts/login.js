@@ -1,188 +1,213 @@
  const crypto = require("crypto");
 
  function showLoading() {
-     $('.loadingItem').fadeIn()
+   $('.loadingItem').fadeIn()
  }
 
  function hideLoading() {
-     $('.loadingItem').fadeOut()
+   $('.loadingItem').fadeOut()
  }
 
  $(window).bind("load", function() {
-     console.log(getUserData())
+   console.log(getUserData())
 
-     if (getUserData() == undefined || getUserData() == null || getUserData() == 'null') {
-         logoff()
-     } else {
-         if (getUserData().success != undefined &&
-             getUserData().success != null &&
-             getUserData().success != 'null') {
-             loginSucess()
-         }
+   if (getUserData() == undefined || getUserData() == null || getUserData() == 'null') {
+     logoff()
+   } else {
+     if (getUserData() != null && getUserData().success == undefined) {
+       loginSucess()
      }
+   }
  });
 
  function enterStudio() {
-     $('x-login').fadeOut()
+   $('x-login').fadeOut()
  }
 
  function sha1(data) {
-     return crypto.createHash("sha1").update(data, "binary").digest("hex");
+   return crypto.createHash("sha1").update(data, "binary").digest("hex");
  }
 
  cadastrando = false;
 
  function isEmail(email) {
-     var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-     return regex.test(email);
+   var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+   return regex.test(email);
  }
 
 
  $(document).on('click', '.button-login', function() {
-     var passHash = sha1($('#senha').val())
-     if ($('#senha').val().length > 5 && isEmail($('#email').val())) {
-         if (cadastrando) {
-             if ($('#senha').val() == $('#c_senha').val()) {
-                 var createUserQuery = "insert into appdock_db.client(email, password) values('" + $('#email').val() + "','" + passHash + "');"
-                 querySql(createUserQuery, function callback(data) {
-                     if (data.success) {
-                         $('#btnEsqueciSenha').click()
-                     } else {
-                         alert(data.error.message)
-                     }
-                 })
-             } else {
-                 errorPulse()
-                 alert("As senhas são diferentes")
-             }
+   if ($('#senha').val().length > 5 && isEmail($('#email').val())) {
+     if (cadastrando) {
+       if ($('#senha').val() == $('#c_senha').val()) {
+         var jsonData = {
+           "username": $('#email').val(),
+           "email": $('#email').val(),
+           "password": $('#senha').val()
+         };
 
-         } else {
-             var select = "select * from appdock_db.client where email = '" + $('#email').val() + "' and password = '" + passHash + "' ;"
-             querySql(select, function callback(data) {
-                 console.log(data)
-                 if (data.success && data.data.length > 0) {
-                     setUserData(data)
-                     loginSucess()
-                 } else {
-                     setUserData({ success: false })
-                     errorPulse()
-                     alert("Email e/ou Senha Inválidos")
-                 }
-             })
-         }
+         requestNoAuth('post', '/auth/local/register', jsonData, function(status, data) {
+           if (status) {
+             setUserData(data)
+             loginSucess()
+             console.log(data.responseJSON)
+             alerta("Cadastro realizado com sucesso!")
+           } else {
+             console.log(data.responseJSON)
+             alerta(data.responseJSON.message[0].messages[0].message, true)
+           }
+         })
+
+       } else {
+         errorPulse()
+         alerta("As senhas são diferentes", true)
+       }
 
      } else {
-         errorPulse()
-         alert("Email e/ou Senha Inválidos")
+       var jsonData = {
+         "identifier": $('#email').val(),
+         "password": $('#senha').val()
+       };
+       requestNoAuth('post', '/auth/local', jsonData, function(status, data) {
+         if (status) {
+           setUserData(data)
+           loginSucess()
+         } else {
+           setUserData({
+             success: false,
+             error: "Bad Request"
+           })
+           errorPulse()
+           alerta("Falha na tentativa de login...", true)
+         }
+       })
      }
+
+   } else {
+     errorPulse()
+     alerta("Email e/ou Senha Inválidos")
+   }
  })
 
  function errorPulse() {
-     $('x-login').find('div').find('div').toggleClass('error_pulse')
+   $('x-login').find('div').find('div').toggleClass('error_pulse')
  }
 
  $(document).on('click', '#btnCadastro', function() {
-     cadastrando = true;
-     modeLogin()
+   cadastrando = true;
+   modeLogin()
  })
 
  $(document).on('click', 'x-label[logoff]', function() {
-     logoff()
+   logoff()
  })
 
  $(document).on('click', '#btnEsqueciSenha', function() {
-     if (cadastrando) {
-         cadastrando = false;
-         modeCadastro()
-     } else {
-         if (isEmail($('#email').val())) {
-             var novaSennha = Math.floor(Math.random() * 999999) + 111111;
-             var passHash = sha1(novaSennha.toString())
-             var select = "update appdock_db.client set password = '" + passHash + "' where email = '" + $("#email").val() + "' ;"
-
-             querySql(select, function callback(data) {
-                 console.log(data)
-                 if (data.success) {
-                     alert('Sua nova senha é:  ' + novaSennha)
-                 } else {
-                     setUserData({ success: false })
-                     errorPulse()
-                     alert(data.error)
-                 }
-             })
-
-             //recoveryPassword(novaSennha, $("#email").val())
+   if (cadastrando) {
+     cadastrando = false;
+     modeCadastro()
+   } else {
+     if (isEmail($('#email').val())) {
+       requestNoAuth('post', '/auth/forgot-password', {
+         "email": $('#email').val()
+       }, function(status, data) {
+         if (status) {
+           modeLogin()
          } else {
-             errorPulse()
-             alert("Email Inválido")
+           setUserData({
+             success: false,
+             error: "Bad Request"
+           })
+           errorPulse()
+           alerta("Falha na requisição...", true)
          }
+       })
+     } else {
+       errorPulse()
+       alert("Email Inválido")
      }
+   }
  })
 
  function loginSucess() {
+   if (getUserData().success == undefined) {
+     rendererData()
+     enterStudio()
+     genetateTokens()
+   } else {
+     logoff()
+   }
+ }
 
-     if (getUserData().success) {
-         rendererData()
-         enterStudio()
-     } else {
-         logoff()
-     }
+ function genetateTokens() {
+   rocketNetwork('post', '/init-api', {
+     "email": getUserData().user.email
+   }, function(status, data) {
+     rocketNetwork('post', '/token', {
+       "email": getUserData().user.email,
+       "secret": data.data[0].secret
+     }, function(status, dataToken) {
+
+       data.data[0].token = dataToken.data[0].token
+
+       setKeyData(JSON.stringify(data))
+     })
+   })
  }
 
  function rendererData() {
-     if (getUserData().success) {
-         var q = "select container.*, container.id as containerId from appdock_db.container " +
-             " inner join appdock_db.style ON appdock_db.container.styleId = style.id " +
-             " where appdock_db.container.clientId = " + getUserData().data[0].id
+   if (getUserData().success == undefined) {
 
-         querySql(q, function(data) {
-             console.log(data)
+     var clientId = getUserData().user.id
+     console.log(clientId)
 
-             if (data == undefined || data == null || data == 'null') {
-                 logoff()
-                 return
-             }
-             if (data.success == false) {
-                 logoff()
-                 return
-             }
-             $('.welcome').css('display', 'flex')
-             setHomeData(data)
-             initHome(data)
-         });
-     } else {
+     requestGet('get', '/homes/?clientId=' + clientId, function(status, data) {
+       if (status) {
+         $('.welcome').css('display', 'flex')
+         setHomeData(data)
+         console.log(data)
+         initHome(data)
+       } else {
          logoff()
-         alerta("Tente novamente!", true)
-         return
-     }
+         errorPulse()
+         alerta("Oops, falha ao carregar containers", true)
+       }
+     })
+   } else {
+     logoff()
+     alerta("Tente novamente!", true)
+     return
+   }
  }
 
  function logoff() {
-     $('x-login').fadeIn()
-     setUserData({ success: false })
-     $('.welcome').css('display', 'none')
+   $('x-login').fadeIn()
+   setUserData({
+     success: false
+   })
+   $('.welcome').css('display', 'none')
  }
 
  function modeLogin() {
-     $(this).css('display', 'none')
-     $('#c_senha').css('display', 'block')
-     $('#c_senha').css('display', 'block')
-     $('#btnLogin').css('background', '#087d0d')
-     $('#btnLogin').text("CADASTRAR")
-     $('#btnLogin').text("CADASTRAR")
-     $('#btnEsqueciSenha').find('x-label').text("LOGIN")
-     $('#btnLogin').css("color", "white")
-     $('#title').text("Cadastro")
+   $(this).css('display', 'none')
+   $('#c_senha').css('display', 'block')
+   $('#c_senha').css('display', 'block')
+   $('#btnLogin').css('background', '#087d0d')
+   $('#btnLogin').text("CADASTRAR")
+   $('#btnLogin').text("CADASTRAR")
+   $('#btnEsqueciSenha').find('x-label').text("LOGIN")
+   $('#btnLogin').css("color", "white")
+   $('#title').text("Cadastro")
  }
 
  function modeCadastro() {
-     $('#btnCadastro').css('display', 'block')
-     $('#c_senha').css('display', 'none')
-     $('#c_senha').css('display', 'none')
-     $('#btnLogin').css('background', '#330782')
-     $('#btnLogin').text("ENTRAR")
-     $('#btnLogin').text("ENTRAR")
-     $('#btnEsqueciSenha').find('x-label').text("ESQUECI A SENHA")
-     $('#btnLogin').css("color", "white")
-     $('#title').text("Login")
+   $('#btnCadastro').css('display', 'block')
+   $('#c_senha').css('display', 'none')
+   $('#c_senha').css('display', 'none')
+   $('#btnLogin').css('background', '#330782')
+   $('#btnLogin').text("ENTRAR")
+   $('#btnLogin').text("ENTRAR")
+   $('#btnEsqueciSenha').find('x-label').text("ESQUECI A SENHA")
+   $('#btnLogin').css("color", "white")
+   $('#title').text("Login")
  }

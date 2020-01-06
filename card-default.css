@@ -1,0 +1,37 @@
+create-view>div{
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+  cursor: auto;
+  padding: 2px;
+  position: relative !important;
+}
+
+
+create-view[default]{display: block;height: auto;position: relative;border-radius: 6px;box-shadow: 0 0 20px black;}
+create-view[default]>div[title]{font-size: 17px;padding: 10px;overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1; /* number of lines to show */color: black;position: relative;}
+create-view[default]>div[subTitle]{padding-left: 10px;color: #6d6d6d;display: inline-block;vertical-align: bottom;}
+create-view[default]>div[picture1]{height: 170px;background: #c0c0c078;border: 1px dashed #2196F3;display: flex;align-items: center;justify-content: center;/* position: absolute; */top: 0;width: 100%;font-size: 60px;color: silver;}
+create-view[default]>div[buttonOk]{padding: 10px;border-top: 1px solid #c0c0c073;color: blue;margin-top: 10px;border-bottom: 1px solid #c0c0c073;display: flex;align-items: center;/* justify-content: center; */font-size: 12px;border-radius: 0 0 6px 6px;}
+create-view[default]>div[buttonCancel]{display: none;}
+create-view[default]>div[price1]{
+     color: black;
+     padding-left: 10px;
+     font-size: 20px;
+     }
+create-view[default]>div[price2]{font-size: 11px;padding-left: 10px;color: green;}
+create-view[default]>div[buttonConfig]{position: absolute;top:-2px;font-size: 28px;right: 16px;color: black;display: none;}
+create-view[default]>div[likes1]{display: none;}
+create-view[default]>div[likes2]{display: none;}
+create-view[default]>div[likes3]{display: none;}
+
+create-view[default]>div[picture2]{display: none;}
+
+create-view div:hover{
+box-shadow: 0 0 20px  #2196F3 !important;
+
+background: #2196f370;
+}

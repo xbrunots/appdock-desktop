@@ -1,15 +1,15 @@
+//d
 const mysql = require('mysql');
-const os = require("os");
 
 NODE_ENV = 'debug'
 PASSWORD = 'pwdHmg'
 BYPASS_TOKEN = true
 
-MYSQL_HOST = 'mysql669.umbler.com'
-MYSQL_DEBUG_PORT = 41890
-MYSQL_USER = 'appdock_user'
+MYSQL_HOST = 'db4free.net'
+MYSQL_DEBUG_PORT = 3306
+MYSQL_USER = 'appdock'
 MYSQL_PASSWORD = 'ana010118'
-MYSQL_DB = 'appdock_db'
+MYSQL_DB = 'appdock'
 
 
 TABLES_HOST = 'mysql669.umbler.com'
@@ -25,19 +25,20 @@ SECRET = 'zdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhd
 
 
 var prod = mysql.createPool({
-    host: TABLES_HOST,
-    user: TABLES_USER,
-    password: TABLES_PASSWORD,
-    database: TABLES_DB,
+    host: MYSQL_HOST,
+    user: MYSQL_USER,
+    port: MYSQL_DEBUG_PORT,
+    password: MYSQL_PASSWORD,
+    database: MYSQL_DB,
     multipleStatements: true
 });
 
 var debug = mysql.createPool({
-    host: TABLES_HOST,
-    port: TABLES_DEBUG_PORT,
-    user: TABLES_USER,
-    password: TABLES_PASSWORD,
-    database: TABLES_DB,
+    host: MYSQL_HOST,
+    port: MYSQL_DEBUG_PORT,
+    user: MYSQL_USER,
+    password: MYSQL_PASSWORD,
+    database: MYSQL_DB,
     multipleStatements: true
 });
 
@@ -46,7 +47,7 @@ function initPool() {
 }
 
 module.exports = {
-    query: function(sql, res, callback) {
+    query: function(sql, callback) {
         initPool().getConnection(function(err, connection) {
             if (NODE_ENV != 'prod') {
                 console.log(sql)
@@ -63,7 +64,6 @@ module.exports = {
                         console.log(error)
                         return
                     }
-                    res.json(error);
                     callback({ success: false, error: error })
                 } else {
                     callback({ success: true, data: results[0] })

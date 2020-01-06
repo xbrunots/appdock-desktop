@@ -6,6 +6,7 @@
     "main": "app.js",
     "scripts": {
         "start": "electron app.js",
+        "prod": "electron app.js",
         "dist": "electron-builder --linux snap",
         "appimage": "electron-builder --linux appimage"
     },

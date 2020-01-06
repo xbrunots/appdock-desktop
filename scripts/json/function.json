@@ -1,0 +1,178 @@
+  [{
+      "type": "click",
+      "name": "OnClick()",
+      "params": null,
+      "response": "Boolean",
+      "icon": "fas fa-code",
+      "charStart": "{",
+      "charEnd": "}",
+      "class": "event",
+      "iconBg": "#673ab75e"
+    },
+    {
+      "type": "longclick",
+      "name": "OnLongClick()",
+      "params": null,
+      "response": "Boolean",
+      "icon": "fas fa-code",
+      "charStart": "{",
+      "charEnd": "}",
+      "class": "event",
+      "iconBg": "#673ab75e"
+    },
+    {
+      "type": "doubleclick",
+      "name": "OnDoubleClick()",
+      "params": null,
+      "response": "Boolean",
+      "icon": "fas fa-code",
+      "charStart": "{",
+      "charEnd": "}",
+      "class": "event",
+      "iconBg": "#673ab75e"
+    },
+    {
+      "type": "enter",
+      "name": "OnEnter()",
+      "params": null,
+      "response": "Boolean",
+      "icon": "fas fa-eye",
+      "charStart": "{",
+      "charEnd": "}",
+      "class": "event",
+      "iconBg": "#2196f34d"
+    },
+    {
+      "type": "keypress",
+      "name": "OnKeyPress()",
+      "params": null,
+      "response": "KeyString, KeyCode",
+      "icon": "fas fa-backspace",
+      "charStart": "{",
+      "charEnd": "}",
+      "class": "event",
+      "iconBg": "#4caf504a"
+    },
+    {
+      "type": "click",
+      "name": "OnClick()",
+      "params": null,
+      "response": "Boolean",
+      "icon": "fas fa-code",
+      "charStart": "{",
+      "charEnd": "}",
+      "class": "event",
+      "iconBg": "#673ab75e"
+    },
+    {
+      "type": "snack",
+      "name": "showSnack(text, delay)",
+      "params": "text, delay",
+      "response": "Boolean",
+      "icon": "fas fa-arrow-right",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#673ab75e"
+    }, {
+      "type": "toast",
+      "name": "showToast(text, delay)",
+      "params": "text, delay",
+      "response": "Boolean",
+      "icon": "fas fa-arrow-right",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#673ab75e"
+    }, {
+      "type": "toast",
+      "name": "setText(attributeID, text)",
+      "params": "attributeID, text",
+      "response": "Boolean",
+      "icon": "fas fa-font",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#525558c9"
+    } , {
+      "type": "toast",
+      "name": "setText(text)",
+      "params": "text",
+      "response": "Boolean",
+      "icon": "fas fa-font",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#525558c9"
+    }, {
+      "type": "toast",
+      "name": "fadeIn()",
+      "params": "text",
+      "response": "Boolean",
+      "icon": "fas fa-feather-alt",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#141414"
+    }, {
+      "type": "toast",
+      "name": "fadeIn(attributeID)",
+      "params": "text",
+      "response": "Boolean",
+      "icon": "fas fa-feather-alt",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#141414"
+    }, {
+      "type": "toast",
+      "name": "fadeOut()",
+      "params": "text",
+      "response": "Boolean",
+      "icon": "fas fa-feather-alt",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#141414"
+    }, {
+      "type": "toast",
+      "name": "fadeOut(attributeID)",
+      "params": "text",
+      "response": "Boolean",
+      "icon": "fas fa-feather-alt",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#141414"
+    }, {
+      "type": "toast",
+      "name": "invokeAnimation(animationName)",
+      "params": "text",
+      "response": "Boolean",
+      "icon": "fas fa-feather-alt",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#141414"
+    }, {
+      "type": "toast",
+      "name": "resize(percentHeight, percentWidth)",
+      "params": "text",
+      "response": "Boolean",
+      "icon": "fas fa-feather-alt",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#141414"
+    }, {
+      "type": "toast",
+      "name": "resize(attributeID,percentHeight, percentWidth)",
+      "params": "text",
+      "response": "Boolean",
+      "icon": "fas fa-feather-alt",
+      "charStart": "",
+      "charEnd": ";",
+      "class": "fun",
+      "iconBg": "#141414"
+    }
+  ]
