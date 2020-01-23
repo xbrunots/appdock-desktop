@@ -11,13 +11,14 @@
         "appimage": "electron-builder --linux appimage"
     },
     "devDependencies": {
-        "electron": "^3.0.2",
+        "electron": "^3.1.13",
         "electron-builder": "^21.2.0",
         "electron-packager": "^14.1.1",
         "ember-cli-materialize": "^0.22.0"
     },
     "dependencies": {
         "@simonwep/pickr": "^1.4.7",
+        "adbkit": "^2.11.1",
         "asar": "^2.0.1",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
@@ -26,7 +27,7 @@
         "debug": "~2.6.3",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
-        "firebase-admin": "8.6.1",
+        "firebase-admin": "^8.6.1",
         "firebase-functions": "0.7.0",
         "jade": "~1.11.0",
         "jsonwebtoken": "^8.2.1",
