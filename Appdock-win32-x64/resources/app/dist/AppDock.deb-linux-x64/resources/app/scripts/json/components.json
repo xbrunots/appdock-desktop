@@ -1,0 +1,111 @@
+  [{
+          "config": {
+              "title": "BUTTON",
+              "icon": "memory"
+          },
+          "name": "BUTTON",
+          "text": "BUTTON",
+          "bg": "#3f51b5",
+          "textColor": "#FFFFFF",
+          "h": 6,
+          "w": 32,
+          "src": null,
+          "srcStyle": "?",
+          "fontSize": 14,
+          "textAlign": "?",
+          "marginLeft": "?",
+          "marginBottom": "?",
+          "marginRight": "?",
+          "marginTop": "?",
+          "borderRadius": "?",
+          "alinhament": "C"
+      },
+      {
+          "config": {
+              "title": "LABEL",
+              "icon": "memory"
+          },
+          "name": "LABEL",
+          "text": "LABEL",
+          "bg": "#FFFFFF",
+          "textColor": "#141414",
+          "h": 6,
+          "w": 32,
+          "src": null,
+          "srcStyle": "?",
+          "fontSize": 16,
+          "textAlign": "?",
+          "marginLeft": "?",
+          "marginBottom": "?",
+          "marginRight": "?",
+          "marginTop": "?",
+          "borderRadius": "?",
+          "alinhament": "C"
+      },
+      {
+          "config": {
+              "title": "INPUT",
+              "icon": "memory"
+          },
+          "name": "INPUT",
+          "text": "INPUT",
+          "bg": "#FFFFFF",
+          "textColor": "#141414",
+          "h": 6,
+          "w": 32,
+          "src": null,
+          "srcStyle": "?",
+          "fontSize": 16,
+          "textAlign": "?",
+          "marginLeft": "?",
+          "marginBottom": "?",
+          "marginRight": "?",
+          "marginTop": "?",
+          "borderRadius": "?",
+          "alinhament": "C"
+      },
+      {
+          "config": {
+              "title": "IMAGEVIEW",
+              "icon": "memory"
+          },
+          "name": "IMAGEVIEW",
+          "text": "IMAGEVIEW",
+          "bg": "#FFFFFF",
+          "textColor": "#141414",
+          "h": 6,
+          "w": 32,
+          "src": "https://cdn1.iconfinder.com/data/icons/computer-world/128/box-256.png",
+          "srcStyle": "full",
+          "fontSize": 16,
+          "textAlign": "?",
+          "marginLeft": "?",
+          "marginBottom": "?",
+          "marginRight": "?",
+          "marginTop": "?",
+          "borderRadius": "?",
+          "alinhament": "C"
+      },
+      {
+          "config": {
+              "title": "LIST",
+              "icon": "memory"
+          },
+          "name": "LIST",
+          "text": "LIST",
+          "bg": "#FFFFFF",
+          "textColor": "#141414",
+          "h": 6,
+          "w": 32,
+          "src": null,
+          "srcStyle": "full",
+          "fontSize": 16,
+          "textAlign": "?",
+          "marginLeft": "?",
+          "marginBottom": "?",
+          "marginRight": "?",
+          "marginTop": "?",
+          "borderRadius": "?",
+          "alinhament": "C"
+      }
+  ]

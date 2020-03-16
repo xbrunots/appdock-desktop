@@ -1,3 +1,80 @@
+function setDataValue(key, value) {
+    var newData = JSON.parse($(GLOBAL_COMPONENT_ID).attr('data'))
+    newData.forEach(element => {
+        if (element.el == key) {
+            element.value = value
+        }
+    });
+    $(GLOBAL_COMPONENT_ID).attr('data', JSON.stringify(newData))
+}
+
+function setDataValue(key, value, id) {
+    var newData = JSON.parse($("#" + id.replace("#", "")).attr('data'))
+    newData.forEach(element => {
+        if (element.el == key) {
+            element.value = value
+        }
+    });
+    $("#" + id.replace("#", "")).attr('data', JSON.stringify(newData))
+}
+
+
+function trackDevices() {
+    var Promise = require('bluebird')
+    var adb = require('adbkit')
+    var client = adb.createClient()
+
+    client.trackDevices()
+        .then(function(tracker) {
+            tracker.on('add', function(device) {
+                //console.log('Device %s was plugged in', device.id)
+                $('x-button[deviceConnectedButton]>span').remove()
+                $('#deviceConnected').removeAttr('disabled')
+                $('#deviceConnected').text(device.id)
+                $('#deviceConnected').css("color", "#ffffff")
+                $('#deviceConnectedIcon').css("color", "#FFFFFF")
+                $('x-button[deviceConnectedButton]').append('<span class="blob green" style="' +
+                    'position: absolute;height: 8px;width: 8px;' +
+                    'background: #4CAF50;border-radius: 50%;' +
+                    'top: 8px; left: 6px;animation: pulse-green 5s infinite !important;"></span>')
+
+                alerta('Device <strong>' + device.id + '</strong>  foi <span style="color:green">conectado</span>')
+                $('x-button[menubar-run]').removeAttr('disabled')
+                $('x-button[menubar-saverun]').removeAttr('disabled')
+                $('deviceconnectedbutton').removeAttr('disabled')
+            })
+            tracker.on('remove', function(device) {
+                //console.log('Device %s was unplugged', device.id)
+                $('x-button[deviceConnectedButton]>span').remove()
+                $('#deviceConnected').text("desconetado")
+                $('#deviceConnected').attr('disabled', 'disabled')
+                $('#deviceConnected').css("color", "rgba(255, 255, 255, 0.3)")
+                $('#deviceConnectedIcon').css("color", "rgba(255, 255, 255, 0.3)")
+                alerta('Device <strong>' + device.id + '</strong> foi <span style="color:#541717">removido</span>')
+                $('x-button[menubar-saverun]').attr('disabled', true)
+                $('x-button[menubar-run]').attr('disabled', true)
+                $('deviceconnectedbutton').attr('disabled', true)
+
+            })
+            tracker.on('end', function() {
+                //console.log('Tracking stopped')
+                $('x-button[deviceConnectedButton]>span').remove()
+                $('#deviceConnected').text("desconetado")
+                $('#deviceConnected').attr('disabled', 'disabled')
+                $('#deviceConnected').css("color", "rgba(255, 255, 255, 0.3)")
+                $('#deviceConnectedIcon').css("color", "rgba(255, 255, 255, 0.3)")
+                $('x-button[menubar-run]').attr('disabled', true)
+                $('x-button[menubar-saverun]').attr('disabled', true)
+                $('deviceconnectedbutton').attr('disabled', true)
+                alerta('Device <strong>' + device.id + '</strong> foi <span style="color:#ff980033">desconectado</span>', true)
+            })
+        })
+        .catch(function(err) {
+            console.error('Something went wrong:', err.stack)
+        })
+}
+
+
 function strToBoolean(string) {
     if (string == undefined) {
         return false
@@ -18,7 +95,7 @@ function strToBoolean(string) {
 }
 
 function updateData(itemId, keyValue, value) {
-    console.log(value)
+    //console.log(value)
     var newData = JSON.parse($(itemId).attr('data'))
     var ok = false
     newData.forEach(d => {
@@ -121,6 +198,7 @@ $(document).on('click', 'span[config-adapter]', function() {
         top: '20px'
     }, 100)
     $(this).find("i").removeClass("rotating")
+    $('x-label[select_view]>input').val("")
 
     rocketNetwork('get', '/rocket/routes', {}, function(status, data) {
         setRocketData(JSON.stringify(data))
@@ -166,8 +244,8 @@ $(function() {
                 if (before.length) before.after(clone);
                 else parent.prepend(clone);
 
-                console.log($(ui.item))
-                createObject(ui.item)
+                //console.log($(ui.item))
+                createObject(ui.item, 'x-body')
                 $(ui.item).remove()
 
             }
@@ -177,7 +255,7 @@ $(function() {
     $('.sortable').each(function() {
         var clone, before, parent;
         $(this).sortable({
-            connectWith: ' x-button[dockcontainer]',
+            connectWith: ' x-button[create-card]',
             helper: "clone",
             ghost: true,
             start: function(event, ui) {
@@ -190,8 +268,16 @@ $(function() {
                 if (before.length) before.after(clone);
                 else parent.prepend(clone);
 
-                console.log($(ui.item))
-                createObject(ui.item)
+
+                //console.log("------------")
+                //console.log($(ui))
+                //console.log(ui)
+                //console.log($(ui.item))
+                //console.log($(parent))
+                //console.log(parent)
+                //console.log("------------")
+
+                createObject(ui.item, 'x-body')
                 $(ui.item).remove()
 
             }
@@ -209,7 +295,7 @@ $(function() {
     //
     //     },
     //     stop: function(event, ui) {
-    //       console.log($('x-body>x-button[componentcreated]'))
+    //       //console.log($('x-body>x-button[componentcreated]'))
     //       var newPos = 0
     //       Array.from($('x-body>x-button[componentcreated]')).forEach(element => {
     //         newPos = newPos + 1
@@ -348,11 +434,11 @@ function hex2rgba_convert(hex, opacity = 100) {
 
 function updatePositon(uid, newIndex) {
     if (uid != undefined && uid.toString().length > 0) {
-        console.log(uid)
-        console.log(newIndex)
+        //console.log(uid)
+        //console.log(newIndex)
         var continerId = $('x-menuitem[container].x-menu-selected').attr('data-id')
         requestGet('get', '/components/?containerId=' + continerId + "&uid=" + uid + "&_sort=index:ASC", function(status, data) {
-            console.log(data)
+            //console.log(data)
             if (status) {
                 request('put', '/components/' + data[0].id, {
                         "index": newIndex
@@ -366,8 +452,8 @@ function updatePositon(uid, newIndex) {
 
 function updateName(uid, newName) {
     if (uid != undefined && uid.toString().length > 0) {
-        console.log(uid)
-        console.log(newName)
+        //console.log(uid)
+        //console.log(newName)
 
         var lista = getCurrentComponent().filter(function(item) {
             return item.name.toLowerCase().replace("#", "") === newName.toLowerCase().replace("#", "")
@@ -386,7 +472,7 @@ function updateName(uid, newName) {
             });
             var continerId = $('x-menuitem[container].x-menu-selected').attr('data-id')
             requestGet('get', '/components/?containerId=' + continerId + "&uid=" + uid + "&_sort=index:ASC", function(status, data) {
-                console.log(data)
+                //console.log(data)
                 if (status) {
                     request('put', '/components/' + data[0].id, {
                             "name": newName,
@@ -414,8 +500,44 @@ $(document).on('click', 'x-struct-option>span[delete]', function() {
         $('body').append($('x-struct-option'))
         $('x-struct-option').fadeOut(200)
         $($(this).attr('data-id')).remove()
+        $('.selected-struct').remove()
         deleteButton($(this).attr('data-id').replace('#', ''))
     }
+})
+
+
+$(document).on('click', 'x-struct-option>span[config-duplicate]', function() {
+    var newElement = $(GLOBAL_COMPONENT_ID).clone()
+    $('x-body').append(newElement)
+    var maior = 0
+    $('x-body>x-button[componentcreated]').each(function(i, elemento) {
+        var regex = /\d+/g;
+        //console.log(elemento)
+        var string = $(elemento).attr('id');
+        var matches = string.match(regex);
+        if (parseInt(matches) > maior) {
+            maior = parseInt(matches)
+        }
+    })
+    var size = (parseInt(maior) * 1) + 1
+    var newId = $('#attr3').val().toLowerCase() + "" + (size + 1)
+    $(newElement).attr('id', newId)
+        //console.log(newId)
+
+    var newData = JSON.parse($(newElement).attr('data'))
+    newData.forEach(element => {
+        if (element.el.toLowerCase().trim() == "id") {
+            element.value = newId
+        }
+        if (element.el.toLowerCase().trim() == "left") {
+            element.value = parseInt(element.value) + 10
+        }
+        if (element.el.toLowerCase().trim() == "top") {
+            element.value = parseInt(element.value) + 5
+        }
+    });
+    $("#" + newId).attr('data', JSON.stringify(newData))
+    rendererComponent($("#" + newId), true)
 })
 
 $(document).on('click', 'x-menuitem[estruct]', function() {
@@ -450,7 +572,7 @@ $(document).on('click', '.close-theme-colors', function() {
     $('x-menu-vs').find('img').removeClass('x-menu-vs-i-active')
 })
 
-$(document).on('click', '[x-settings-theme]', function() {
+$(document).on('click', '[menubar-theme]', function() {
     $('x-theme-dialog').fadeIn(100)
     $('x-theme-dialog').css('display', 'flex')
 
@@ -495,21 +617,11 @@ $(document).on('click', '#button-save-transaction', function() {
             element.value = hash.toString()
         }
     });
-    updateButton()
+    updateButton(function(e) {
+
+    })
     $(GLOBAL_COMPONENT_ID).attr('data', JSON.stringify(newData))
     $('x-button[close-config]').click()
-})
-
-$(document).on('click', 'x-button[goevents]', function() {
-    if (parseInt($('x-events').css('right')) < 0) {
-        $('x-events').animate({
-            right: '200px'
-        }, 100)
-    } else {
-        $('x-events').animate({
-            right: '-200px'
-        }, 100)
-    }
 })
 
 
@@ -600,6 +712,8 @@ function hexToRgbA(ahex) {
 }
 
 $(document).on('click', 'x-button[componentCreated]', function() {
+    $(".el-width").parent().css("display", "block")
+    $(".el-height").parent().css("display", "block")
 
     if ($(this).find("[create-lottie]").length > 0) {
         $(this).text("")
@@ -625,17 +739,40 @@ $(document).on('click', 'x-button[componentCreated]', function() {
     var data = JSON.parse($(GLOBAL_COMPONENT_ID).attr('data'))
 
     var fixedValue = "false"
+    var archorBottom = "NONE"
+    var archorTop = "NONE"
     var fixedArray = data.filter(function(item) {
         return item.el.toLowerCase().trim() === "fixed"
     })
+    var archorBottomArray = data.filter(function(item) {
+        return item.el.toLowerCase().trim() === "archor-bottom"
+    })
+
+    var archorTopdArray = data.filter(function(item) {
+        return item.el.toLowerCase().trim() === "archor-top"
+    })
+
 
     if (fixedArray.length > 0) {
         fixedValue = fixedArray[0].value
     }
 
+    if (archorBottomArray.length > 0) {
+        archorBottom = archorBottomArray[0].value
+    } else {
+        $('#attr38').val("NONE")
+    }
+
+    if (archorTopdArray.length > 0) {
+        archorTop = archorTopdArray[0].value
+    } else {
+        $('#attr39').val("NONE")
+    }
+
 
 
     $('.x-attributes').css('display', 'flex')
+    $("#attr40").val(0)
 
     data.forEach(element => {
 
@@ -652,7 +789,8 @@ $(document).on('click', 'x-button[componentCreated]', function() {
 
         $('.x-attributes[json]').css('display', 'none')
 
-        if (!$(GLOBAL_COMPONENT_ID).hasClass('component-is-LIST')) {
+        if (!$(GLOBAL_COMPONENT_ID).hasClass('component-is-LIST') &&
+            !$(GLOBAL_COMPONENT_ID).hasClass('component-is-LINEAR_LAYOUT')) {
             $('.x-attributes[orientation]').css('display', 'none')
             $('.x-attributes[adapter]').css('display', 'none')
         }
@@ -663,7 +801,7 @@ $(document).on('click', 'x-button[componentCreated]', function() {
             }
             $('.x-attributes[json]').css('display', 'flex')
             var dataParams = JSON.parse($(GLOBAL_COMPONENT_ID).attr('data'))
-            console.log(dataParams)
+                //console.log(dataParams)
             var params = dataParams.filter(function(item) {
                 return item.el.toLowerCase().trim() === "json"
             })
@@ -677,24 +815,46 @@ $(document).on('click', 'x-button[componentCreated]', function() {
 
     })
 
+    if ($(GLOBAL_COMPONENT_ID).hasClass('component-is-FONTAWESOME')) {
+        $(".el-width").parent().css("display", "none")
+        $(".el-height").parent().css("display", "none")
+    }
+
     $('.sidebar-R ').animate({
         width: '200px'
     }, 100)
 
-    $('x-button[goevents]').attr('style', 'display;flex !important')
-    $('x-button[goevents]').css('opacity', '1')
     if (!cntrlIsPressed) {
         $('.border_live').remove()
     }
     var db = ''
     if ($('#attr3').val().toLowerCase() == "list") {
-        db = ' <span tooltip-rox target="x-simulator>x-parent-box" data-title="Clique para adicionar um Adapter ao List" config-adapter><i class="fas fa-rocket"></i></span>' +
-            ' <span tooltip-rox  target="x-simulator>x-parent-box" data-title="Clique para relacionar um Container ao Adapter e usá-lo como Card" config-card=""><x-icon name="dashboard"> </x-icon> ' +
+        db = ' <span tooltip-rox target="x-simulator>x-parent-box" data-title="Clique para relacionar um adapter ao List" config-adapter><i class="fas fa-rocket"></i></span>' +
+            ' <span tooltip-rox  target="x-simulator>x-parent-box" data-title="Clique para relacionar um container ao List e usá-lo como Card" config-card=""> ' +
+            '<x-icon style=" position: absolute;        left: 5px; " name="dashboard"> </x-icon> ' +
             '<label>...</label></span>'
+    } else if ($('#attr3').val().toLowerCase() == "bottomsheet") {
+        db = ' <span tooltip-rox  target="x-simulator>x-parent-box" data-title="Clique para relacionar um Container ao Adapter e usá-lo como Card" config-bottomsheet="">' +
+            '<x-icon style=" position: absolute;        left: 5px; " name="dashboard"> </x-icon> ' +
+            '<label>...</label></span>'
+    } else if ($('#attr3').val().toLowerCase() == "fontawesome") {
+        db = ' <span tooltip-rox  target="x-simulator>x-parent-box" data-title="Clique para alterar o Icon" icons>' +
+            '  <i class="far fa-grin-beam-sweat"></i> ' +
+            '' +
+            '</span>'
+    } else if ($('#attr3').val().toLowerCase() == "linear_layout") {
+        db = ' <span tooltip-rox  target="x-simulator>x-parent-box" data-title="Clique para adicionar componentes" additem>' +
+            ' <i class="fas fa-plus"></i> ' +
+            '' +
+            '</span>'
     }
+
+    db = db + ' <span tooltip-rox target="x-simulator>x-parent-box" data-title="Clique para duplicar" config-duplicate><i class="fas fa-copy"></i></span>'
+
     var borderLive = '<div id="border-live" class="border_live" style="position: absolute; display: block;   width:100% !important;height:100% !important;"> ' +
         ' <x-struct-option> ' +
-        '<span tooltip-rox  target="x-simulator>x-parent-box" data-title="Clique para deletar o Componente" delete data-id="' + GLOBAL_COMPONENT_ID + '"></span>' + db +
+        '<span tooltip-rox  target="x-simulator>x-parent-box" data-title="Clique para deletar o Componente" delete data-id="' + GLOBAL_COMPONENT_ID + '"> ' +
+        '<i class="fas fa-eraser"></i></span>' + db +
         '</x-struct-option>' +
         ' </div>'
     refreshMarkLines(GLOBAL_COMPONENT_ID)
@@ -710,28 +870,49 @@ $(document).on('click', 'x-button[componentCreated]', function() {
     $('x-line-y').css('left', $(GLOBAL_COMPONENT_ID).css('left'))
     $('x-line-y').css('top', '0px')
 
-    $(GLOBAL_COMPONENT_ID).draggable({
-        disabled: false,
-        grid: [5, 5],
-        drag: function(event, ui) {
-            $('x-line-x').css('left', '0px')
-            $('x-line-x').css('top', ui.position.top)
 
-            $('x-line-y').css('left', ui.position.left)
-            $('x-line-y').css('top', '0px')
 
-            refreshMarkLines(GLOBAL_COMPONENT_ID)
+    $('#attr30').removeAttr('disabled')
+    $('#attr31').removeAttr('disabled')
+        //console.log(archorBottom)
+        //console.log(archorTop)
+    if (archorTop.toUpperCase() != "NONE" || archorBottom.toUpperCase() != "NONE") {
+        $('#attr30').attr('disabled', 'disabled')
+        $('#attr31').attr('disabled', 'disabled')
+        $(GLOBAL_COMPONENT_ID).draggable({
+            disabled: true
+        });
+    } else {
+        $(GLOBAL_COMPONENT_ID).draggable({
+            disabled: false,
+            grid: [5, 5],
+            drag: function(event, ui) {
+                $('x-line-x').css('left', '0px')
+                $('x-line-x').css('top', ui.position.top)
 
-        }
-    });
+                $('x-line-y').css('left', ui.position.left)
+                $('x-line-y').css('top', '0px')
+
+                refreshMarkLines(GLOBAL_COMPONENT_ID)
+
+            }
+        });
+    }
 
     $(GLOBAL_COMPONENT_ID).resizable('destroy');
     $(GLOBAL_COMPONENT_ID).resizable({
         disabled: false,
-        handler: 'n, s, e, w',
+        handler: 'n, s, e, w, nw',
         minHeight: 24,
         resize: function(event, ui) {
-            saveButtonToNewSize(ui.size.height, ui.size.width, fixedValue)
+            var w = ui.size.width
+            if (w == 300) w = 320
+            if ($(GLOBAL_COMPONENT_ID).hasClass('component-is-FONTAWESOME')) {
+                w = ui.size.height
+            }
+            $(GLOBAL_COMPONENT_ID).css('width', w)
+            $(GLOBAL_COMPONENT_ID).css('height', ui.size.height)
+            saveButtonToNewSize(ui.size.height, w, fixedValue)
         }
     });
 
@@ -743,10 +924,11 @@ $(document).on('click', 'x-button[componentCreated]', function() {
 
 
     $(GLOBAL_COMPONENT_ID).prepend(borderLive)
-    console.log(currentComponentCard)
+        //console.log(currentComponentCard)
     if (currentComponentCard.length > 0 && currentComponentCard[0].card != null) {
-        console.log("OK")
+        //console.log("OK")
         $('x-struct-option>span[config-card]>label').text(currentComponentCard[0].card.alias + " [" + currentComponentCard[0].card.id + "]")
+        $('x-struct-option>span[config-bottomsheet]>label').text(currentComponentCard[0].card.alias + " [" + currentComponentCard[0].card.id + "]")
     }
 
     openFunctions()
@@ -788,8 +970,68 @@ $(document).on('click', 'x-button[componentCreated]', function() {
 
     }
 
+
 })
 firtsSelectedItem = ""
+iconsNoFilter = []
+
+function getMenuFontIcons(callback) {
+    //x-menu contextmenu-icons
+    $('x-menux[contextmenu-icons]').html("")
+    iconsNoFilter = fontIconsJson.icons
+    fontIconsJson.icons.forEach(function(data, index) {
+        var card = '<x-menuitem data-value="' + data + '"><i class="far fa-' + data + '"></i> <x-label><label>' + data + '</label></x-label></x-menuitem>'
+        $('x-menux[contextmenu-icons]').append(card)
+    });
+
+    callback()
+}
+
+function filterIcons(value, callback) {
+    $('x-menux[contextmenu-icons]').html("")
+    iconsNoFilter.forEach(function(data, index) {
+        if (data.toLowerCase().indexOf(value.toLowerCase()) != -1) {
+            var card = '<x-menuitem data-value="' + data + '"><i class="far fa-' + data + '"></i> <x-label><label>' + data + '</label></x-label></x-menuitem>'
+            $('x-menux[contextmenu-icons]').append(card)
+        }
+    });
+    callback()
+}
+
+
+$(document).on('click', 'x-menux[contextmenu-icons]>x-menuitem', function(e) {
+    $('#attr4').val($(this).attr('data-value'))
+    setDataValue("text", $(this).attr('data-value'), GLOBAL_COMPONENT_ID)
+    applyStyles()
+    $('div[icons-font]').fadeOut(100)
+})
+
+
+$(document).on('click', 'div[icons-font]>x-icon', function(e) {
+    $('div[icons-font]').fadeOut(100)
+})
+
+$(document).on('keydown', 'x-input[icons-filters]', function(e) {
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if (code == 13) {
+        $('x-throbber[loadfiltericon]').css('display', 'block')
+        if ($(this).val().trim().length < 1) {
+            getMenuFontIcons(function() {
+                $('x-throbber[loadfiltericon]').css('display', 'none')
+            })
+        } else {
+            filterIcons($(this).val().trim(), function() {
+                $('x-throbber[loadfiltericon]').css('display', 'none')
+            })
+        }
+    }
+})
+
+$(document).on('click', 'span[icons]', function(e) {
+    $('div[icons-font]').css('display', 'flex')
+    $('div[icons-font]').fadeIn(100)
+})
+
 
 $(document).on('click', 'x-event-action>x-select', function(e) {
     if (parseInt($('x-event-action>x-select>x-menu').css('min-width')) > 600) {
@@ -804,7 +1046,27 @@ $(document).on('click', 'x-connect-container-dialog>x-card>header>x-button', fun
 $(document).on('click', 'x-struct-option>span[config-card]', function(e) {
     $('x-connect-container-dialog').fadeIn(150)
     $('x-connect-container-dialog').css('display', 'flex')
+    $('#btnLinkContainer').attr('target', 'card')
 
+})
+
+$(document).on('click', 'x-menu[additem]>x-menuitem', function() {
+    $('x-menu[additem]').fadeOut()
+    createObject(this, GLOBAL_COMPONENT_ID)
+})
+
+
+$(document).on('click', 'x-struct-option>span[additem]', function(e) {
+    $('x-menu[additem]').css('top', (e.pageY + 10) + "px")
+    $('x-menu[additem]').css('left', e.pageX + "px")
+    $('x-menu[additem]').fadeIn()
+
+})
+
+$(document).on('click', 'x-struct-option>span[config-bottomsheet]', function(e) {
+    $('x-connect-container-dialog').fadeIn(150)
+    $('x-connect-container-dialog').css('display', 'flex')
+    $('#btnLinkContainer').attr('target', 'bottomsheet')
 })
 
 $(document).on('click', '#btnLinkContainer', function(e) {
@@ -817,7 +1079,7 @@ $(document).on('click', '#btnLinkContainer', function(e) {
         return item.id === matches
     })
 
-    console.log(containers)
+    //console.log(containers)
 
     var isMine = containers.length > 0
 
@@ -826,13 +1088,20 @@ $(document).on('click', '#btnLinkContainer', function(e) {
             return item.name.toLowerCase().trim() === GLOBAL_COMPONENT_ID.replace("#", "").toLowerCase().trim()
         })
 
+        var isBS = $(this).attr('target') == "bottomsheet"
         request('put', '/components/' + data[0].id, {
-                "card": matches
+                "card": matches,
+                "isBottomSheet": isBS
             },
             function(status, data) {
                 if (status) {
                     $('x-connect-container-dialog').fadeOut(150)
-                    $('x-struct-option>span[config-card]>label').text(matches)
+                    if (isBS) {
+                        $('x-struct-option>span[config-bottomsheet]>label').text(matches)
+                    } else {
+                        $('x-struct-option>span[config-card]>label').text(matches)
+                    }
+                    $('#labelSelectContainer').text("")
                     var newComponent = getCurrentComponent()
 
                     newComponent.filter(function(item) {
@@ -845,6 +1114,8 @@ $(document).on('click', '#btnLinkContainer', function(e) {
                     alerta("OOps Algo deu Errado! tente novamente :)", true);
                 }
             })
+
+
     } else {
         alerta("ID Inválido!", true);
     }
@@ -883,6 +1154,7 @@ $(document).on('mouseleave', '*[tooltip-rox]', function(e) {
 
 
 function saveButtonToNewSize(newH, newW, fixedValue) {
+
     var hMove = parseInt(newH)
     var wMove = parseInt(newW)
 
@@ -892,15 +1164,15 @@ function saveButtonToNewSize(newH, newW, fixedValue) {
     var hFinal = Math.round(hMove / h100)
     var wFinal = Math.round(wMove / w100)
 
+    //console.log("newH:" + newH + " h100:" + h100 + " hFinal:" + hFinal)
+    //console.log("newW:" + newW + " w100:" + w100 + " wFinal:" + wFinal)
+
     $('#attr12').val(wFinal)
     $('#attr13').val(hFinal)
 
     if (fixedValue.toLowerCase().trim() == "true") {
         $('.el-height').attr('disabled', true)
         $('.el-width').attr('disabled', true)
-
-        $(GLOBAL_COMPONENT_ID).css('height', newW)
-        $(GLOBAL_COMPONENT_ID).css('width', newW)
     }
 
     var dataJsonD = JSON.parse($(GLOBAL_COMPONENT_ID).attr("data"))
@@ -935,7 +1207,17 @@ function saveButtonToNewSize(newH, newW, fixedValue) {
         })
     }
 
-    console.log(dataJsonD)
+    if (GLOBAL_COMPONENT_ID.toLowerCase().indexOf("fontawesome") != -1) {
+        dataJsonD.forEach(d => {
+            if (d.el.toLowerCase() == "text-size") {
+                d.value = (hFinal * 3)
+            }
+        })
+
+        $(GLOBAL_COMPONENT_ID).css('font-size', (hFinal * 3) + 'px')
+        $(GLOBAL_COMPONENT_ID).find('i[icon]').css('font-size', (hFinal * 3) + 'px')
+    }
+    //console.log(dataJsonD)
     $(GLOBAL_COMPONENT_ID).attr("data", JSON.stringify(dataJsonD))
 
     refreshMarkLines(GLOBAL_COMPONENT_ID)
@@ -948,14 +1230,14 @@ $(document).on('click', 'x-alinhamento-body>x-button[pull-left]', function() {
             left = $(button).parent().css('left')
         }
 
-        console.log("XXXX")
-        console.log(left)
-        console.log($(button).parent().css('left'))
-        console.log("XXXX")
+        //console.log("XXXX")
+        //console.log(left)
+        //console.log($(button).parent().css('left'))
+        //console.log("XXXX")
     })
 
-    console.log("ESCOLHIDO:")
-    console.log(left)
+    //console.log("ESCOLHIDO:")
+    //console.log(left)
 
     $('.border_live').parent().animate({ 'left': left })
     newLeft($('.border_live').parent().attr('id'), left)
@@ -976,14 +1258,14 @@ $(document).on('click', 'x-alinhamento-body>x-button[pull-top]', function() {
             top = $(button).parent().css('top')
         }
 
-        console.log("XXXX")
-        console.log(top)
-        console.log($(button).parent().css('top'))
-        console.log("XXXX")
+        //console.log("XXXX")
+        //console.log(top)
+        //console.log($(button).parent().css('top'))
+        //console.log("XXXX")
     })
 
-    console.log("ESCOLHIDO:")
-    console.log(top)
+    //console.log("ESCOLHIDO:")
+    //console.log(top)
 
     $('.border_live').parent().animate({ 'top': top })
     newTop($('.border_live').parent().attr('id'), top)
@@ -1016,14 +1298,14 @@ $(document).on('click', 'x-alinhamento-body>x-button[pull-top]', function() {
             top = $(button).parent().css('top')
         }
 
-        console.log("XXXX")
-        console.log(top)
-        console.log($(button).parent().css('top'))
-        console.log("XXXX")
+        //console.log("XXXX")
+        //console.log(top)
+        //console.log($(button).parent().css('top'))
+        //console.log("XXXX")
     })
 
-    console.log("ESCOLHIDO:")
-    console.log(top)
+    //console.log("ESCOLHIDO:")
+    //console.log(top)
 
     $('.border_live').parent().animate({ 'top': top })
     newTop($('.border_live').parent().attr('id'), top)
@@ -1044,14 +1326,14 @@ $(document).on('click', 'x-alinhamento-body>x-button[pull-right]', function() {
             left = $(button).parent().css('left')
         }
 
-        console.log("XXXX")
-        console.log(left)
-        console.log($(button).parent().css('left'))
-        console.log("XXXX")
+        //console.log("XXXX")
+        //console.log(left)
+        //console.log($(button).parent().css('left'))
+        //console.log("XXXX")
     })
 
-    console.log("ESCOLHIDO:")
-    console.log(left)
+    //console.log("ESCOLHIDO:")
+    //console.log(left)
 
     $('.border_live').parent().animate({ 'left': left })
     newLeft($('.border_live').parent().attr('id'), left)
@@ -1081,8 +1363,8 @@ function saveButtonToNewDirection() {
     $('#attr31').val(xFinal)
     $('#attr30').val(yFinal)
 
-    console.log("LEFT: " + xFinal)
-    console.log("TOP: " + yFinal)
+    //console.log("LEFT: " + xFinal)
+    //console.log("TOP: " + yFinal)
 
 
 
@@ -1118,7 +1400,7 @@ function saveButtonToNewDirection() {
         })
     }
 
-    console.log(dataJsonD)
+    //console.log(dataJsonD)
     $(GLOBAL_COMPONENT_ID).attr("data", JSON.stringify(dataJsonD))
 }
 
@@ -1204,7 +1486,7 @@ function refreshMarkLines(id) {
 }
 
 function newLeft(id, value) {
-    console.log(value)
+    //console.log(value)
     var percentOne = parseInt($('x-body').css('width')) / 100
     var value2 = parseInt(value) / percentOne
     $('#attr31').val(Math.round(value2))
@@ -1212,7 +1494,7 @@ function newLeft(id, value) {
 }
 
 function newTop(id, value) {
-    console.log(value)
+    //console.log(value)
     var percentOne = parseInt($('x-body').css('height')) / 100
     var value2 = parseInt(value) / percentOne
     $('#attr30').val(Math.round(value2))
@@ -1220,7 +1502,7 @@ function newTop(id, value) {
 }
 
 function newSizeHeight(id, value) {
-    console.log(value)
+    //console.log(value)
     var percentOne = parseInt($('x-body').css('height')) / 100
     var value2 = parseInt(value) / percentOne
     $('#attr13').val(Math.round(value2))
@@ -1228,7 +1510,7 @@ function newSizeHeight(id, value) {
 }
 
 function newSizeWidtht(id, value) {
-    console.log(value)
+    //console.log(value)
     var percentOne = parseInt($('x-body').css('width')) / 100
     var value2 = parseInt(value) / percentOne
     $('#attr12').val(Math.round(value2))
@@ -1250,19 +1532,23 @@ function hideAttributes() {
         right: '-200px'
     }, 100)
 
-    $('x-button[goevents]').css('opacity', '0')
 
     $('x-codetabs').css('display', 'none')
 }
 
-function applyStyles() {
-    const divv = document.querySelectorAll('x-body>x-button[componentcreated]');
+function applyStyles(dock) {
+    var dockBox = "x-body"
+    if (dock != undefined) {
+        dockBox = dock
+    }
+
+    const divv = document.querySelectorAll(dockBox + '>x-button[componentcreated]');
     divv.forEach(el => {
         if (el != undefined) {
 
             var item = JSON.parse($(el).attr('data'))
 
-            console.log(item)
+            //console.log(item)
 
             var id = $(el).attr('id')
             var name = getAttributByEl(item, 'name').value
@@ -1277,6 +1563,30 @@ function applyStyles() {
             } else {
                 fixedValue = "false"
             }
+
+
+            var archorBottom = getAttributByEl(item, 'archor-bottom')
+            var archorTop = getAttributByEl(item, 'archor-top')
+
+            var archorTopValue = "NONE"
+            if (archorTop != undefined && archorTop != null) {
+                archorTopValue = archorTop.value
+                    //console.log(id + " ARCHOR-OFF-----------------------TOP> " + archorTopValue)
+            } else {
+                archorTopValue = "NONE"
+            }
+
+            var archorBottomValue = "NONE"
+            if (archorBottom != undefined && archorBottom != null) {
+                archorBottomValue = archorBottom.value
+                    //console.log(id + " ARCHOR-OFF-----------------------BOTTOM> " + archorBottomValue)
+
+            } else {
+                archorBottomValue = "NONE"
+            }
+
+
+
 
             $(el).attr('create-' + name, '')
 
@@ -1330,28 +1640,69 @@ function applyStyles() {
                 width = width
             }
 
-            console.log("_________________")
-            console.log("_________________")
-            console.log("_________________")
-            console.log(getAttributByEl(item, 'z-index'))
-            console.log("_________________")
-            console.log("_________________")
-            console.log("_________________")
+            if (name.toLowerCase().trim() == "fontawesome" ||
+                name.toLowerCase().trim() == "round_button") {
+                height = width
+            }
+
+            //console.log("_________________")
+            //console.log("_________________")
+            //console.log("_________________")
+            //console.log(getAttributByEl(item, 'z-index'))
+            //console.log("_________________")
+            //console.log("_________________")
+            //console.log("_________________")
 
             if (getAttributByEl(item, 'z-index') != undefined) {
                 element.css("z-index", getAttributByEl(item, 'z-index').value)
             }
 
+            if (getAttributByEl(item, 'font-family') != undefined) {
+                element.css("font-family", getAttributByEl(item, 'font-family').value)
+            }
             element.css("border-radius", borderRadius + "px")
             element.css("border-color", borderColor)
             element.css("border-width", borderSize)
             element.css("border-style", borderStyle)
+
+
+            if (archorBottomValue != "NONE" || archorTopValue != "NONE") {
+                var percentOneY = parseInt($('x-body').css('height')) / 100
+                var percentOneX = parseInt($('x-body').css('width')) / 100
+
+                if (archorBottomValue == "RIGHT") {
+                    xValue = ((100 * percentOneX) - width) + "px"
+                    yValue = ((100 * percentOneY) - height) + "px"
+                } else if (archorBottomValue == "LEFT") {
+                    xValue = "0px"
+                    yValue = ((100 * percentOneY) - height) + "px"
+                } else if (archorBottomValue == "CENTER") {
+                    xValue = ((50 * percentOneX) - (width / 2)) + "px"
+                    yValue = ((100 * percentOneY) - height) + "px"
+
+                } else if (archorTopValue == "RIGHT") {
+                    xValue = ((100 * percentOneX) - width) + "px"
+                    yValue = "0px"
+
+                } else if (archorTopValue == "LEFT") {
+                    xValue = "0px"
+                    yValue = "0px"
+
+                } else if (archorTopValue == "CENTER") {
+                    xValue = ((50 * percentOneX) - (width / 2)) + "px"
+                    yValue = "0px"
+
+                }
+
+            }
+
             element.css("left", xValue)
             element.css("top", yValue)
-                // element.css("margin-top", marginTop + "px")
-                // element.css("margin-right", marginRight + "px")
-                // element.css("margin-bottom", marginBottom + "px")
-                // element.css("margin-left", marginLeft + "px")
+
+            // element.css("margin-top", marginTop + "px")
+            // element.css("margin-right", marginRight + "px")
+            // element.css("margin-bottom", marginBottom + "px")
+            // element.css("margin-left", marginLeft + "px")
             element.css("text-align", textAlign)
             element.css("font-size", textSize + "px")
 
@@ -1366,11 +1717,18 @@ function applyStyles() {
                 element.css("background-size", backgroundSize)
             }
 
+            if (getAttributByEl(item, 'padding') != undefined) {
+                element.css("padding", getAttributByEl(item, 'padding').value)
+                if (name.toLowerCase().trim() == "imageview") {
+                    element.css("background-size", width - parseInt(getAttributByEl(item, 'padding').value))
+                }
+            }
+
             element.css("background-color", hexToRgbA(backgroundColor))
 
-            console.log("++++++")
-            console.log(backgroundColor)
-            console.log("++++++")
+            //console.log("++++++")
+            //console.log(backgroundColor)
+            //console.log("++++++")
             if (background.indexOf("{{") > -1) {
                 element.css("background", "rgba(33, 150, 243, 0.28)")
                 element.css("color", "rgba(33, 150, 243, 0.7)")
@@ -1400,16 +1758,26 @@ function applyStyles() {
 
             }
 
+            if (name.toLowerCase().trim() == "fontawesome" ||
+                name.toLowerCase().trim() == "round_button") {
+                $(element).html('<i icon class="fas fa-grin-tongue-wink" aria-hidden="true"></i>')
+            }
 
-            // if (float != null && float != 'null' && float != "?") {
-            //   if (float.toString().toUpperCase() == "CENTER") {
-            //     var x = $('x-body').width() / 2
-            //     var xx = x - (width / 2)
-            //     element.css('margin-left', xx + "px")
-            //   } else {
-            //     element.css("float", float)
-            //   }
-            // } 
+            if (name.toLowerCase().trim() == "fontawesome" && textSize == "fontawesome") {
+                $(element).text("fa-grin-tongue-wink")
+
+            }
+
+            if (name.toLowerCase().trim() == "fontawesome" && textSize != "fontawesome") {
+                var classE = "fa-" + text.replace("fa-", "")
+                $(element).html('<i icon style="color:' + textColor + ';font-size:' + textSize + 'px ; ;" class="fas ' + classE + '"></i>')
+            }
+
+            if (name.toLowerCase().trim() == "fontawesome") {
+                element.css("width", (textSize + 3) + "px")
+                element.css("height", (textSize + 3) + "px")
+            }
+
 
         }
         isCardRenderer()
@@ -1423,12 +1791,12 @@ function isCardRenderer() {
         return item.id === parseInt($('x-menuitem[container].x-menu-selected').attr('data-id'))
     })
 
-    console.log(homeItem)
+    //console.log(homeItem)
 
     if (homeItem.length > 0 && homeItem[0].isCard != null && homeItem[0].isCard) {
         $('x-parent-box').addClass('iscard')
         $('x-parent-box').attr('iscard', true)
-        console.log("OKOKOKOKOKOKOKOKOK")
+            //console.log("OKOKOKOKOKOKOKOKOK")
 
         var cardSize = homeItem[0].cardSize
 
@@ -1467,7 +1835,7 @@ $(document).on('mouseleave', '#containers-rocket-data>x-menuitem', function() {
 
 $(document).on('click', 'span[delrocket]', function(e) {
 
-    console.log("#containers-rocket-data>x-menuitem[data-id='" + $(this).attr('data-id') + "']")
+    //console.log("#containers-rocket-data>x-menuitem[data-id='" + $(this).attr('data-id') + "']")
 
     if (confirm("Deletar " + $(this).attr('data-text') + " ?")) {
         request('delete', '/layouts/' + parseInt($(this).attr('data-id')), {}, function(status, data) {
@@ -1492,7 +1860,7 @@ function exitProject(el) {
 
     alert($(el).parent().attr("data-id"));
 
-    console.log($(el).parent().parent());
+    //console.log($(el).parent().parent());
 
 }
 
@@ -1502,7 +1870,7 @@ function getNumber(str) {
 
 function recreate(item, size, callback) {
     if ($("#" + item.toLowerCase() + size).length > 0) {
-        console.log("SSSSSSSS" + size)
+        //console.log("SSSSSSSS" + size)
         recreate(item, size + 1)
     }
     callback(size)
@@ -1520,82 +1888,100 @@ $(document).on('click', 'span[doctab-close]', function(e) {
 
 $(document).on('click', 'x-button[create-lottie]', function(e) {
 
-    1217
 })
 
 
 
 function createObject(object, dock) {
-    var data = getAttribs()
-    var item = $(object).attr("data-type")
-
-    var maior = 0
-    $('x-body>x-button[componentcreated]').each(function(i, elemento) {
-        var regex = /\d+/g;
-
-        console.log(elemento)
-
-        var string = $(elemento).attr('id');
-        var matches = string.match(regex);
-        if (parseInt(matches) > maior) {
-            maior = parseInt(matches)
-        }
-    })
-    var size = (parseInt(maior) * 1) + 1
-
-    console.log(maior)
-
-
-    data[0].value = item.toString().toLowerCase() + size
-    data[1].value = item.toString().toUpperCase()
-    data[2].value = item.toString().toLowerCase()
-
-    if (item.toUpperCase() == "LABEL") {
-
-        data[4].value = "#141414"
-        data[6].value = "#FFFFFF"
-        data[10].value = 33
-        data[11].value = 6
-    } else if (item.toUpperCase() == "INPUT") {
-        data[4].value = "#141414"
-        data[6].value = "#FFFFFF"
-        data[10].value = 2
-        data[11].value = 1
-
-    } else if (item.toUpperCase() == "IMAGEVIEW") {
-        data[4].value = "#141414"
-        data[6].value = "#FFFFFF"
-        data[10].value = 3
-        data[11].value = 3
-
-    } else if (item.toUpperCase() == "LIST") {
-        data[4].value = "#141414"
-        data[6].value = "#FFFFFF"
-        data[10].value = 100
-        data[11].value = 35
-    } else if (item.toUpperCase() == "DOCK-VERTICAL") {
-        data[4].value = "#141414"
-        data[6].value = "#FFFFFF"
-        data[10].value = 100
-        data[11].value = 35
-    } else if (item.toUpperCase() == "DOCK-HORIZONTAL") {
-        data[4].value = "#141414"
-        data[6].value = "#FFFFFF"
-        data[10].value = 100
-        data[11].value = 35
+    //console.log("ENTROU" + dock)
+    //console.log("ENTROU" + $(object).attr('itemid'))
+    if ($(dock).find('x-button[create-bottomsheet]').length > 0 && $(object).attr('itemid').indexOf("BOTTOMSHEET") != -1) {
+        alerta('Desculpe, BottomSheets trabalham sozinhos, não podemos incluir outro em seu Container...', true)
     } else {
-        data[4].value = "#141414"
-        data[6].value = "#FFFFFF"
-        data[10].value = 33
-        data[11].value = 6
+        var data = getAttribs()
+        var item = $(object).attr("data-type")
+
+        var maior = 0
+        $('x-body>x-button[componentcreated]').each(function(i, elemento) {
+            var regex = /\d+/g;
+
+            //console.log(elemento)
+
+            var string = $(elemento).attr('id');
+            var matches = string.match(regex);
+            if (parseInt(matches) > maior) {
+                maior = parseInt(matches)
+            }
+        })
+        var size = (parseInt(maior) * 1) + 1
+
+        //console.log(maior)
+
+
+        data[0].value = item.toString().toLowerCase() + size
+        data[1].value = item.toString().toUpperCase()
+        data[2].value = item.toString().toLowerCase()
+
+        if (item.toUpperCase() == "LABEL") {
+
+            data[4].value = "#141414"
+            data[6].value = "#FFFFFF"
+            data[10].value = 60
+            data[11].value = 6
+        } else if (item.toUpperCase() == "INPUT") {
+            data[4].value = "#141414"
+            data[6].value = "#FFFFFF"
+            data[10].value = 60
+            data[11].value = 7
+
+        } else if (item.toUpperCase() == "IMAGEVIEW") {
+            data[4].value = "#141414"
+            data[6].value = "#FFFFFF"
+            data[10].value = 50
+            data[11].value = 35
+
+        } else if (item.toUpperCase() == "LIST") {
+            data[4].value = "#141414"
+            data[6].value = "#FFFFFF"
+            data[10].value = 100
+            data[11].value = 35
+        } else if (item.toUpperCase() == "FONTAWESOME") {
+            data[4].value = "#141414"
+            data[6].value = "#FFFFFF00"
+            data[5].value = 20
+            data[10].value = 8
+            data[11].value = 8
+
+            data.filter((d) => {
+                return d.el.toLowerCase() == "text"
+            })[0].value = "grin-tongue-wink"
+
+            $("#" + data[1].value).text("fa-grin-tongue-wink")
+            $("#" + data[1].value).html('<i icon class="fas fa-grin-tongue-wink" aria-hidden="true"></i>')
+
+        } else if (item.toUpperCase() == "ROUND_BUTTON") {
+            data[4].value = "#FFFFFF"
+            data[6].value = "#b71c1c"
+            data[10].value = 10
+            data[11].value = 10
+        } else {
+            data[4].value = "#141414"
+            data[6].value = "#FFFFFF"
+            data[10].value = 50
+            data[11].value = 8
+        }
+        //console.log("ID-DEDE:", '#' + item.toString().toLowerCase() + size)
+        //console.log("ID-DEDE:", dock)
+
+        elementGet(dock, JSON.stringify(data), item, item.toString().toLowerCase() + size)
+
+        rendererComponent($('#' + item.toString().toLowerCase() + size), true, )
     }
-    elementGet(JSON.stringify(data), item, item.toString().toLowerCase() + size)
-    rendererComponent($('#' + item.toString().toLowerCase() + size), true)
 }
 
-function elementGet(data, item, iid) {
+function elementGet(dock, data, item, iid) {
     var element = ' '
-    console.log(data)
+        //console.log(data)
 
     if (item.toUpperCase() == "BUTTON") {
 
@@ -1614,16 +2000,62 @@ function elementGet(data, item, iid) {
         element = element + "<x-button createList componentCreated data='" + data + "' id='" + iid + "'  >  </x-button>"
     } else if (item.toUpperCase() == "LOTTIE") {
         element = element + "<x-button lottie componentCreated data='" + data + "' id='" + iid + "'> Lottie  </x-button>"
+    } else if (item.toUpperCase() == "FONTAWESOME") {
+        var newData = JSON.parse(data)
+        newData.forEach(element => {
+            if (element.el == "left") {
+                element.value = 0
+            } else if (element.el == "top") {
+                element.value = 0
+            } else if (element.el == "z-index") {
+                element.value = 99
+            } else if (element.el == "width") {
+                element.value = 10
+            } else if (element.el == "height") {
+                element.value = 10
+            } else if (element.el == "border-radius") {
+                element.value = 200
+            } else if (element.el == "text-size") {
+                element.value = 20
+            }
+        });
+
+        element = element + "<x-button  componentCreated data='" + JSON.stringify(newData) + "' id='" + iid + "'> <i class='fas fa-plus'></i>  </x-button>"
+    } else if (item.toUpperCase() == "ROUND_BUTTON") {
+        var newData = JSON.parse(data)
+        newData.forEach(element => {
+            if (element.el == "left") {
+                element.value = 0
+            } else if (element.el == "top") {
+                element.value = 0
+            } else if (element.el == "z-index") {
+                element.value = 99
+            } else if (element.el == "width") {
+                element.value = 13
+            } else if (element.el == "height") {
+                element.value = 13
+            } else if (element.el == "border-radius") {
+                element.value = 200
+            }
+        });
+        element = element + "<x-button  componentCreated data='" + JSON.stringify(newData) + "' id='" + iid + "'>  <i class='fas fa-plus'></i>  </x-button>"
     } else {
         element = element + "<x-button componentCreated data='" + data + "' id='" + iid + "'> <x-label>Button</x-label> </x-button>"
     }
-    $('x-body').append(element)
+    //console.log("DOCK_CHECK:  " + dock)
+    //console.log("DOCK_CHECK element:  " + element)
+    $(dock).append(element)
+
+    if (item.toLowerCase().trim() == "fontawesome") {
+        $("#" + iid).css("width", (20 + 3) + "px")
+        $("#" + iid).css("height", (20 + 3) + "px")
+    }
 }
 
 function rgb2hex(orig) {
-    console.log(orig)
+    //console.log(orig)
     var rgb = orig.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+)/i);
-    console.log(rgb)
+    //console.log(rgb)
     return (rgb && rgb.length === 4) ? "#" +
         ("0" + parseInt(rgb[1], 10).toString(16)).slice(-2) +
         ("0" + parseInt(rgb[2], 10).toString(16)).slice(-2) +
@@ -1631,7 +2063,7 @@ function rgb2hex(orig) {
 }
 
 $(document).on('change', '.box-values, .box-values>main>x-input', function() {
-    console.log(value)
+    //console.log(value)
 
     var value = ""
     if ($(this).hasClass('type-color')) {
@@ -1641,9 +2073,6 @@ $(document).on('change', '.box-values, .box-values>main>x-input', function() {
     } else {
         value = $(this).val()
     }
-    console.log(value)
-
-    console.log(GLOBAL_COMPONENT_ID)
 
     var newData = JSON.parse($(GLOBAL_COMPONENT_ID).attr('data'))
     if ($(this).hasClass('el-top')) {
@@ -1654,10 +2083,27 @@ $(document).on('change', '.box-values, .box-values>main>x-input', function() {
         });
     } else if ($(this).hasClass('el-left')) {
         newData.forEach(element => {
-            if (element.el == "left") {
+            if (element.el == "padding") {
                 element.value = value
             }
         });
+
+    } else if ($(this).hasClass('el-padding')) {
+        var okZ = false
+
+        newData.forEach(element => {
+            if (element.el == "padding") {
+                element.value = value
+            }
+        });
+        if (!okZ) {
+            newData.push({
+                id: newData[(newData.length - 1)].id + 1,
+                el: "padding",
+                type: "NUMBER",
+                value: value
+            })
+        }
     } else if ($(this).hasClass('el-z-index')) {
 
         var okZ = false
@@ -1676,30 +2122,52 @@ $(document).on('change', '.box-values, .box-values>main>x-input', function() {
                 value: value
             })
         }
-        console.log("ZZZZZZZZZZZZZZZZ: " + okZ + " " + value)
+        //console.log("ZZZZZZZZZZZZZZZZ: " + okZ + " " + value)
     } else if ($(this).hasClass('type-id')) {
         updateName(GLOBAL_COMPONENT_ID.replace("#", ""), value)
     } else {
         newData.forEach(element => {
             if (element.id == $(this).parent().attr('data-id')) {
-                console.log(element.id)
+                //console.log(element.id)
                 element.value = value
             }
         });
     }
 
-    console.log($(this).parent())
-    console.log(newData)
+    //console.log($(this).parent())
+    //console.log(newData)
 
     $(GLOBAL_COMPONENT_ID).attr('data', JSON.stringify(newData))
-    console.log('---------------------------')
-    console.log(value)
-    console.log('---------------------------')
+        //console.log('---------------------------')
+        //console.log(value)
+        //console.log('---------------------------')
 
     applyStyles()
 })
 
 
+$(document).on('click', 'x-menu[custom-fonts]>x-menuitem', function(e) {
+    $('x-menu[custom-fonts]').fadeOut();
+    $('#attr7').val($(this).find('label').text())
+    var newData = JSON.parse($(GLOBAL_COMPONENT_ID).attr('data'))
+    newData.forEach(element => {
+        if (element.el == "font-family") {
+            element.value = $(this).find('label').text()
+        }
+    });
+    $(GLOBAL_COMPONENT_ID).attr('data', JSON.stringify(newData))
+
+    applyStyles()
+})
+
+$(document).on('click', '#attr7', function(e) {
+    var posX = e.pageX - parseInt($('x-menu[custom-fonts]').css('width'));
+    var posY = e.pageY;
+
+    $('x-menu[custom-fonts]').css('top', posY + "px")
+    $('x-menu[custom-fonts]').css('left', posX + "px")
+    $('x-menu[custom-fonts]').css('display', 'block');
+})
 
 $(document).on('click', '#menu-file-select > x-menuitem', function() {
 
@@ -1709,8 +2177,8 @@ $(document).on('click', '#menu-file-select > x-menuitem', function() {
     } else {
 
         $('#' + $(this).attr('data-parent')).css("color: #FFFFFF")
-        console.log($(GLOBAL_COMPONENT_ID).attr('data'))
-        console.log($(this).attr('data-id'))
+            //console.log($(GLOBAL_COMPONENT_ID).attr('data'))
+            //console.log($(this).attr('data-id'))
 
         var newData = JSON.parse($(GLOBAL_COMPONENT_ID).attr("data"))
         var ok = false
@@ -1729,12 +2197,12 @@ $(document).on('click', '#menu-file-select > x-menuitem', function() {
             })
         }
 
-        console.log(newData);
+        //console.log(newData);
         $(GLOBAL_COMPONENT_ID).attr('data', JSON.stringify(newData))
-        console.log('---------------------------')
-        console.log($(this).find('x-label').text())
-        console.log($(this).attr('data-id'))
-        console.log('---------------------------')
+            //console.log('---------------------------')
+            //console.log($(this).find('x-label').text())
+            //console.log($(this).attr('data-id'))
+            //console.log('---------------------------')
 
         $('#' + $(this).attr('data-parent')).val($(this).find('x-label').text())
         $('#' + $(this).attr('data-picture-id')).val($(this).attr('data-id'))
@@ -1749,7 +2217,31 @@ function attribSelected(element, id) {
     var action = $(element).attr('type')
     $('#context-attribute').removeClass('context-menu-show')
 
+    var newDataX = JSON.parse($(GLOBAL_COMPONENT_ID).attr('data'))
+    if (id == 39) {
+        $('#attr38').val("NONE")
+        var dataArchor = newDataX
+        dataArchor.forEach(element => {
+            if (element.id == 38) {
+                element.value = "NONE"
+            }
+        });
+        $(GLOBAL_COMPONENT_ID).attr('data', JSON.stringify(dataArchor))
+    }
+
+    if (id == 38) {
+        $('#attr39').val("NONE")
+        var dataArchor = newDataX
+        dataArchor.forEach(element => {
+            if (element.id == 39) {
+                element.value = "NONE"
+            }
+        });
+        $(GLOBAL_COMPONENT_ID).attr('data', JSON.stringify(dataArchor))
+    }
+
     var newData = JSON.parse($(GLOBAL_COMPONENT_ID).attr('data'))
+
     var nok = true
 
     newData.forEach(el => {
@@ -1768,8 +2260,6 @@ function attribSelected(element, id) {
         })
     }
 
-
-
     if (nok && id == 36) {
         newData.push({
             id: id,
@@ -1779,11 +2269,32 @@ function attribSelected(element, id) {
         })
     }
 
+    if (nok && id == 38) {
+        newData.push({
+            id: id,
+            el: "archor-bottom",
+            type: "OPTION",
+            value: $(element).find('x-label').text()
+        })
+    }
+
+
+    if (nok && id == 39) {
+        newData.push({
+            id: id,
+            el: "archor-top",
+            type: "OPTION",
+            value: $(element).find('x-label').text()
+        })
+    }
+
+
+
     $(GLOBAL_COMPONENT_ID).attr('data', JSON.stringify(newData))
 
-    console.log('---------------------------')
-    console.log($(element).find('x-label').text())
-    console.log('---------------------------')
+    //console.log('---------------------------')
+    //console.log($(element).find('x-label').text())
+    //console.log('---------------------------')
     applyStyles()
     $('#attr' + id).val($(element).find('x-label').text())
 
@@ -1793,12 +2304,19 @@ function deleteButton(button) {
 
     var continerId = $('x-menuitem[container].x-menu-selected').attr('data-id')
     requestGet('get', '/components/?containerId=' + continerId + '&name=' + button.toString().trim() + "&_sort=index:ASC", function(status, data) {
-        console.log(data)
+        //console.log(data)
+        var cid = data[0].id
         if (status) {
-            requestGet('delete', '/components/' + data[0].id, function(status, data) {
-                console.log(data)
+            requestGet('delete', '/components/' + cid, function(status, data) {
+
                 if (status) {
                     alerta(button.toString().toLowerCase() + " deletado com sucesso!")
+
+                    let newCurrent = getCurrentComponent().filter((d) => {
+                        return d.id != cid
+                    })
+                    setCurrentComponent(newCurrent)
+
                 } else {
                     alerta("OOps, algo deu errado, tente novamente mais tarde...", true)
                 }
@@ -1809,11 +2327,15 @@ function deleteButton(button) {
     })
 }
 
-function rendererComponent(element, saveSQL) {
+function rendererComponent(element, saveSQL, dock) {
+    //console.log("#################")
+    //console.log(dock)
+    //console.log(element)
+    //console.log("#################")
     if (saveSQL) {
         saveButton(element)
     }
-    applyStyles()
+    applyStyles(dock)
 }
 
 $('.type-color').ColorPicker({
@@ -1844,7 +2366,7 @@ function saveButton(button) {
     if (button != undefined && $(button).attr('id').toString().length > 2) {
         var continerId = $('x-menuitem[container].x-menu-selected').attr('data-id')
         var index = $('x-button[componentcreated]').length
-        console.log(button)
+            //console.log(button)
         var uid = $(button).attr('id')
         button.attr('data-uid', uid)
 
@@ -1863,6 +2385,14 @@ function saveButton(button) {
                     "  <x-label> " + uid + " </x-label> " +
                     "  </x-menuitem>"
                 $('.sidebar-internal').find('.body').find('structs-body').append(item)
+
+                //console.log("BBB-BB-BBB", dataXXX)
+                //console.log("BBB-BB-BBB", data)
+
+                var newCurrent = getCurrentComponent()
+                newCurrent.push(data)
+                setCurrentComponent(newCurrent)
+
             } else {
                 alerta("Erro ao tentar criar um componente...", true)
             }
@@ -1952,7 +2482,7 @@ $(document).on('click', '#btnFase2OK', function() {
 function populateContextViewCreattor(route) {
     rocketNetwork('get', '/~/@' + route, {}, function(status, data) {
         $('x-layout-fase3-contextmenu').html("")
-        console.log(data)
+            //console.log(data)
         var colunasRe = []
         JSON.parse(JSON.stringify(data)).data.forEach(coluna => {
             colunasRe.push(coluna.Field)
@@ -2001,11 +2531,30 @@ $(document).on('click', 'x-layout-fase3-contextmenu>x-menuitem[clear]', function
     $('create-view>div').removeAttr("field")
 })
 
-$(document).on('click', 'x-struct-option>span[function]', function() {
-    openFunctions()
+$(document).on('click', 'fun-header>x-label>x-button[kobit]', function() {
+    if ($(this).hasClass("open")) {} else {
+        if (parseInt($('#sidebar-bottom').css('height')) <= 50) {
+            $('#sidebar-bottom').animate({
+                height: '500px'
+            }, 250)
+            $('fun-header>x-button[close]').find('i').removeClass('fa-chevron-up')
+            $('fun-header>x-button[close]').find('i').addClass('fa-chevron-down')
+        }
+        $('fun-header>x-label>x-button').removeClass("open")
+        $(this).addClass("open")
+        openFunctions()
+    }
 })
 
+
+function openLogcat() {
+    $('fun-logcat').css('display', 'block')
+    $('fun-body').css('display', 'none')
+}
+
 function openFunctions() {
+    $('fun-logcat').css('display', 'none')
+    $('fun-body').css('display', 'block')
     $('.kotlin').val(" ")
     $('.kotlin').val(" ")
     $('.kotlin').html(" ")
@@ -2015,11 +2564,7 @@ function openFunctions() {
 
     var funcs = getAttributByEl(JSON.parse($(GLOBAL_COMPONENT_ID).attr('data')), 'functions').value
 
-    if ($('fun-header>x-label>x-button').text().trim().length > 0) {
-        $('fun-header>x-label>x-button').text("Kobit Script Editor | " + GLOBAL_COMPONENT_ID + " [" + $(GLOBAL_COMPONENT_ID).text() + "]")
-    } else {
-        $('fun-header>x-label>x-button').text("Kobit Script Editor | " + GLOBAL_COMPONENT_ID)
-    }
+    $('fun-header>x-label>x-button[kobit]').html('<i class="fas fa-scroll" style="margin-right:5px"></i> Kobit Script Editor | ' + GLOBAL_COMPONENT_ID)
     if (funcs != "null" && funcs != null && funcs.length > 7) {
         $('.kotlin').val(GLOBAL_DECRIPTO(funcs))
         $('.kotlin').val(GLOBAL_DECRIPTO(funcs))
@@ -2083,7 +2628,7 @@ function addDataBaseIconPoint(target, field) {
 
 function getAttributes($node) {
     $.each($node[0].attributes, function(index, attribute) {
-        console.log(attribute.name + ':' + attribute.value);
+        //console.log(attribute.name + ':' + attribute.value);
     });
 }
 
@@ -2097,7 +2642,7 @@ $(document).on('click', '[x-menu-database]', function() {
     $('x-container-database>x-card>x-panel>x-card[rocket]').remove()
     rendererServiceCards($('x-container-database>x-card>x-panel'))
         // rocketNetwork('get', '/rocket/routes', {}, function(status, data) {
-        //   console.log(data)
+        //   //console.log(data)
         //   if (status) {
         //
         //     data.data.forEach(element => {
@@ -2121,9 +2666,10 @@ $(document).on('click', '[x-menu-database]', function() {
 
 
 function rendererServiceCards(target) {
+    $('lottie-player[rocket]').fadeIn()
     rocketNetwork('get', '/rocket/routes', {}, function(status, data) {
         setRocketData(JSON.stringify(data))
-        console.log(data)
+            //console.log(data)
         if (status) {
             data.data.forEach(element => {
                 var ball = "style = 'color: #c0c0c059 !important;'"
@@ -2132,48 +2678,69 @@ function rendererServiceCards(target) {
                     ball = ""
                 }
 
-                console.log(card);
+                var valueInMb = roundToTwo(element.dataSize / 1024)
+                var styleDb = ' padding-top: 3px;margin-right: 5px;'
+                var sizeDiv = '<x-label class="rocketCardLabelSize"><i style="' + styleDb + '" class="fas fa-database"></i> ' +
+                    valueInMb +
+                    '<p style=" font-size: 11px; display: contents; ">mb ' +
+                    '</p></x-label>'
+
                 var card = ' <x-card rocket data-route="@' + element.route + '">' +
                     '  <x-label> @' + element.route + '</x-label>' +
-                    '  <p ' + ball + '>' + element.registers + ' registros</p>'
+                    '  <p ' + ball + '>' + element.registers + ' registros</p>' +
+                    sizeDiv
                 target.append(card)
             })
         } else {
             alerta("Token inválido! refaça o login para acessar o RocketData", true)
         }
+        $('lottie-player[rocket]').fadeOut()
+
     })
 }
 
+function roundToTwo(num) {
+    return +(Math.round(num + "e+2") + "e-2");
+}
+
 function rendererServiceCardHome(callback) {
+    $('lottie-player[rocket]').fadeIn()
     var target = $('#containers-rocket-data')
     $('#containers-rocket-data>x-menuitem[rocket]').remove()
     var homeId = $('x-containers-body>x-menuitem[container].x-menu-selected').attr('data-id')
     requestGet('get', '/layouts/?email=' + getUserData().user.email, function(status, data) {
         setLayouts(data)
-        console.log(data)
+            //console.log(data)
         if (status) {
             data.forEach(element => {
 
                 var card = ' <x-menuitem rocket data-id="' + element.id + '">' +
-                    '<i class="fas fa-pencil-ruler"></i>' +
+                    '<i class="fas fa-rocket"></i>' +
                     '  <x-label> ' + element.name + '</x-label>' +
                     '  <label> ' + element.route + '</label>' +
                     '</x-menuitem>'
                 target.append(card)
 
             })
+            $('lottie-player[rocket]').fadeOut()
             callback()
+
         } else {
+            $('lottie-player[rocket]').fadeOut()
             alerta("Token inválido! refaça o login para acessar o RocketData", true)
         }
     })
 }
 
 $(document).on('click', '#btnNewRocket', function() {
+    refreshRocketData()
+})
+
+function refreshRocketData() {
     var nome = $('sub-header>x-input').val()
     if (nome.length > 2) {
         rocketNetwork('post', '/+' + nome, {}, function(status, data) {
-            console.log(data)
+            //console.log(data)
             if (status) {
                 $('.rocket').animate({
                     height: '0px',
@@ -2192,8 +2759,7 @@ $(document).on('click', '#btnNewRocket', function() {
         alerta("O nome deve conter no minimo 3 letras", true)
 
     }
-})
-
+}
 
 $(document).on('click', '#addDataBase', function() {
     $('#btnCancelFase3').click()
@@ -2254,7 +2820,7 @@ $(document).on('click', 'x-menuitem.secrets-key', function() {
 })
 
 $(document).on("click", "#button-test-transaction", function() {
-    testAdapter()
+    testAdapter(this)
 })
 
 $(document).on("click", "x-json-pre>.string, x-json-pre>.number, x-json-pre>.boolean", function() {
@@ -2265,15 +2831,23 @@ $(document).on("click", "x-json-pre>.string, x-json-pre>.number, x-json-pre>.boo
     $(this).addClass('json-pre-selected')
 })
 
-function testAdapter() {
+function testAdapter(el) {
+    var rota = $('x-label[select_transation]>input').val().replace("@", "")
+
+    if ($("x-card[adapter-manager]>x-contents>x-label>input").attr('is_external_service')) {
+        rota = rota.replace("@", "")
+
+    } else {
+        rota = '/@' + rota
+    }
+
     if (FIRST_OPEN) {
         FIRST_OPEN = false
         alerta("Atenção, fique sempre atento aos filtros  e configurações do BODY JSON (parte de cima)")
     }
-    var rota = $('x-label[select_transation]>input').val().replace("@", "")
     var body = JSON.parse($('x-json-pre').text())
 
-    rocketNetwork("POST", '/@' + rota, body, function(status, data, timer) {
+    rocketNetwork("POST", rota, body, function(status, data, timer) {
         document.querySelector('x-json-pre-result').innerHTML = "";
         $('x-json-pre-result').append(
             syntaxHighlight(JSON.stringify(data, undefined, 4))
@@ -2357,8 +2931,8 @@ $(document).on('focusout', 'x-label[select_transation]>input', function(e) {
 
 $(document).on('focusout', 'x-label[select_view]>input', function(e) {
     var lista = JSON.parse(getRocketData()).data.filter(function(item) {
-        console.log(item);
-        console.log($('x-label[select_view]>input').val());
+        //console.log(item);
+        //console.log($('x-label[select_view]>input').val());
         return item.route.toLowerCase().includes($('x-label[select_view]>input').val().toLowerCase().replace("@", ""));
     });
     if (lista.length > 0) {
@@ -2394,8 +2968,8 @@ $(document).on('mouseleave', 'x-label[select_transation]>input', function(e) {
 
 $(document).on('mouseleave', 'x-label[select_view]>input', function(e) {
     var lista = JSON.parse(getRocketData()).data.filter(function(item) {
-        console.log(item);
-        console.log($('x-label[select_view]>input').val());
+        //console.log(item);
+        //console.log($('x-label[select_view]>input').val());
         return item.route.toLowerCase().includes($('x-label[select_view]>input').val().toLowerCase().replace("@", ""));
     });
     if (lista.length == 1) {
@@ -2418,7 +2992,14 @@ $(document).on('click', 'x-contextmenu-view>x-menuitem', function(e) {
     var theName = $(this).attr('data-name')
     $($(this).attr('target')).val(theName)
     $('x-contextmenu-view').fadeOut(100)
-
+    if ($(this).hasClass("is_external_service")) {
+        $('x-label[select_transation]>input').val($(this).attr('data-route'))
+        $('x-label[select_transation]>input').attr("is_external_service", true)
+        $('x-json-pre').css('display', 'none')
+    } else {
+        $('x-json-pre').css('display', 'block')
+        $('x-label[select_transation]>input').removeAttr("is_external_service")
+    }
     $('x-label[select_transation]>input').val($(this).attr('data-route'))
 
 })
@@ -2427,21 +3008,21 @@ $(document).on('click', ' x-card[adapter-manager]>x-contents>x-label[select_view
     $('x-contextmenu-view').fadeOut(100)
 })
 
-$(document).on('keydown', 'x-label[select_view]>input', function(e) {
+$(document).on('keyup', 'x-label[select_view]>input', function(e) {
     var lista = JSON.parse(getRocketData()).data.filter(function(item) {
-        console.log(item);
-        console.log($('x-label[select_view]>input').val());
+        //console.log(item);
+        //console.log($('x-label[select_view]>input').val());
         return item.route.toLowerCase().includes($('x-label[select_view]>input').val().toLowerCase().replace("@", ""));
     });
 
     if (getRocketData() != null && getRocketData() != undefined && JSON.parse(getRocketData()).data.length > 0) {
-        autocompleteView(e, lista, "fas fa-pencil-ruler", 'x-label[select_view]>input')
+        autocompleteView(e, lista, "fas fa-rocket", 'x-label[select_view]>input')
     } else {
         rocketNetwork('get', '/rocket/routes', {}, function(status, data) {
             setRocketData(JSON.stringify(data))
             if (status) {
 
-                autocompleteView(e, getRocketData(), "fas fa-pencil-ruler", 'x-label[select_view]>input')
+                autocompleteView(e, getRocketData(), "fas fa-rocket", 'x-label[select_view]>input')
 
             } else {
                 alerta("Token inválido! refaça o login para acessar o RocketData", true)
@@ -2474,8 +3055,6 @@ $(document).on('focusout', '.kotlin', function(e) {
             novoText = "\n\n" + novoText + ele
         }
     })
-
-    $('x-contextmenu-code').fadeOut()
 })
 
 $(document).on('change', '.kotlin', function(e) {
@@ -2484,29 +3063,17 @@ $(document).on('change', '.kotlin', function(e) {
     for (var i = 0; i < lines.length; i++) {
         $('row[fun]>pre>span').text($('row[fun]>pre>span').text() + "" + i + "\n")
     }
+    $('.hwt-backdrop').attr('style', ' height: 1876px;  min-height: 1876px;  max-height: 1876px;')
 })
 
 $(document).on('keyup', '.kotlin', function(e) {
     if (e.which == 32) {
         var words = $('.kotlin').val().trim().split(' ');
         var lastWord = words[words.length - 1];
-        console.log(lastWord);
+        //console.log(lastWord);
     }
 
     $('.kotlin').change()
-})
-
-
-$(document).on('keydown', '.kotlin', function(e) {
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if (code == 9 && $('x-contextmenu-code').css("display") != "none") {
-        $('x-contextmenu-code>x-menuitem:first').click()
-        $('.kotlin').focus()
-    }
-})
-
-$(document).on('click', '.kotlin', function(event) {
-
 })
 
 
@@ -2516,106 +3083,70 @@ function RetornaDataHoraAtual() {
     return localdate;
 }
 
-
-
 GLOBAL_CODE_HISTORICO = []
-$(document).on('click', 'x-contextmenu-code>x-menuitem', function(e) {
-    GLOBAL_CODE_HISTORICO.push({
-        code: $('.kotlin').val(),
-        timer: RetornaDataHoraAtual()
-    })
-    var sufix = "*----*"
-    var words = $('.kotlin').val().trim().split(' ');
-    var lastWord = words[words.length - 1];
-    $('.kotlin').val(lastWord + sufix)
-
-
-    if ($(this).attr("data-class") == "fun") {
-        var core = $('.kotlin').val().split("}")
-        if (core.length > 0) {
-            var a = $(this).attr("data-name") + ")"
-
-            $('.kotlin').val($('.kotlin').val().replace(lastWord + sufix, a))
-
-        } else {
-            var t = $(this).attr("data-name") + ")"
-            $('.kotlin').val($('.kotlin').replace(lastWord + sufix, t))
-        }
-
-        $('.kotlin').highlightWithinTextarea('update');
-        $('textarea').highlightWithinTextarea('update');
-
-    } else {
-        var core = $('.kotlin').val().split("}")
-        if (core.length > 0) {
-            var a = $(this).attr("data-name") + "\n\n\n}"
-
-            $('.kotlin').val($('.kotlin').val().replace(lastWord + sufix, a))
-
-        } else {
-            var t = $(this).attr("data-name") + "\n\n\n}"
-            $('.kotlin').val($('.kotlin').replace(lastWord + sufix, t))
-        }
-
-        $('.kotlin').highlightWithinTextarea('update');
-        $('textarea').highlightWithinTextarea('update');
-    }
-
-    $('.kotlin').val($('.kotlin').val().replace("{{", "{"))
-    $('.kotlin').val($('.kotlin').val().replace("((", "("))
-    $('.kotlin').val($('.kotlin').val().replace("}}", "}"))
-    $('.kotlin').val($('.kotlin').val().replace("))", ")"))
-    $('.kotlin').val($('.kotlin').val().replace(";;", ";"))
-    $('.kotlin').text($('.kotlin').val())
-
-    $('x-contextmenu-code').fadeOut()
-    $('.kotlin').change()
-    $('.kotlin').highlightWithinTextarea('update');
-    $('textarea').highlightWithinTextarea('update');
-
-})
-
-
-$(document).on('click', 'fun-historico>x-menuitem', function(e) {
-
-})
 
 LAST_GLOBAL = ""
-$(document).on('keyup', '.kotlin', function(e) {
-    var mousePostion = e
-    var ignoreContext = false
-    var words = $('.kotlin').val().trim().split(' ');
-    var lastWord = words[words.length - 1];
-    console.log(lastWord);
 
-    if (lastWord.indexOf("{") != -1) {
-        // OnClick(){
-        // teste}
-        lastWord = lastWord.split("}")[0].split("{")[1].trim()
+
+$(document).on('click', '#btnSaveCode', function() {
+    if (parseInt($('.sidebar-R').css('width')) > 1) {
+        saveFuncions(function(c) {
+
+        })
     }
+})
 
 
-    if (lastWord.indexOf("}") != -1) {
-        //     teste
-        // }teste
-        lastWord = lastWord.split("}")[1].trim()
+function saveFuncions(callback) {
+    if (GLOBAL_COMPONENT_ID.length > 2) {
+        try {
+            var hashCode = GLOBAL_ENCRIPTA($('.hwt-highlights').text())
+            var data = JSON.parse($(GLOBAL_COMPONENT_ID).attr("data"))
+            var ok = false
+            data.forEach(d => {
+                if (d.el.toLowerCase() == "functions") {
+                    d.value = hashCode
+                    ok = true
+                }
+            })
+            if (!ok) {
+                data.push({
+                    id: data[(data.length - 1)].id + 1,
+                    el: "functions",
+                    type: "TEXT",
+                    value: hashCode
+                })
+            }
+
+            //console.log($('.hwt-highlights').text())
+            $('x-box[functions]>x-input').val(hashCode)
+            $(GLOBAL_COMPONENT_ID).attr("data", JSON.stringify(data))
+        } catch (e) {
+
+            //console.log(e)
+        }
+
+        updateButton(function(e) {
+            callback(e)
+        })
+    } else {
+        updateButton(function(e) {
+            callback(e)
+        })
     }
+}
 
 
-    console.log("<------->");
-    console.log(lastWord);
-    console.log("<------->");
-    LAST_GLOBAL = lastWord
-    $('.kotlin').change()
-    console.log(ignoreContext);
+function autoCompleteCodes(query, isMethod = false) {
 
-    var eventsStrings = configCode.highlight[0].highlight
-    var methodsStrings = configCode.highlight[6].highlight
+    $('x-contextmenu-code').html(" ")
+
+    var eventsStrings = viewCodes.highlight[0].highlight
+    var methodsStrings = viewCodes.highlight[6].highlight
 
     var newString = []
-    console.log(lastWord)
     eventsStrings.forEach(function(item) {
-        if (item.toLowerCase().includes(lastWord.toLowerCase())) {
+        if (query == "%" || item.toLowerCase().includes(query.trim().toLowerCase())) {
             newString.push({
                 type: 1,
                 name: item,
@@ -2627,101 +3158,73 @@ $(document).on('keyup', '.kotlin', function(e) {
             })
         }
     });
-
     methodsStrings.forEach(function(item) {
-        if (item.toLowerCase().includes(lastWord.toLowerCase())) {
+        if (query == "%" || item.toLowerCase().includes(query.toLowerCase())) {
+            var sicon = "fas fa-arrow-right"
+            var sColor = "#673ab75e"
+            if (item.toLowerCase().includes("animate")) {
+                sicon = 'fas fa-magic'
+                sColor = "#E91E63 "
+            }
+
             newString.push({
                 type: 2,
                 name: item,
                 class: 'fun',
-                icon: "fas fa-arrow-right",
+                icon: sicon,
                 charStart: "",
                 charEnd: ");",
-                iconBg: "#673ab75e"
+                iconBg: sColor
             })
+
         }
     });
 
-
-    autoCompleteCodes(newString, mousePostion, '.kotlin')
-
-})
-
-
-$(document).on('click', '#btnSaveCode', function() {
-    if (parseInt($('.sidebar-R').css('width')) > 1) {
-
-        var hashCode = GLOBAL_ENCRIPTA($('.hwt-highlights').text())
-        var data = JSON.parse($(GLOBAL_COMPONENT_ID).attr("data"))
-        var ok = false
-        data.forEach(d => {
-            if (d.el.toLowerCase() == "functions") {
-                d.value = hashCode
-                ok = true
-            }
-        })
-        if (!ok) {
-            data.push({
-                id: data[(data.length - 1)].id + 1,
-                el: "functions",
-                type: "TEXT",
-                value: hashCode
-            })
-        }
-
-        console.log($('.hwt-highlights').text())
-        $('x-box[functions]>x-input').val(hashCode)
-        $(GLOBAL_COMPONENT_ID).attr("data", JSON.stringify(data))
-        alerta("Salvando alterações, aguarde ...")
-        updateButton()
-            //closeFunctions()
-    }
-})
-
-
-
-$(document).on('click', 'fun-header>x-label>x-button', function() {
-    $('fun-header>x-button[close]').click();
-})
-
-function autoCompleteCodes(lista, e, targetInput) {
-    var code = (e.keyCode ? e.keyCode : e.which);
-
-    $('x-contextmenu-code').attr('style',
-        'z-index:99999999; right:20px; top:80px;'
-    )
-
-    $('x-contextmenu-code').fadeIn()
-    var icon = "fas fa-code"
-    console.log(lista)
-    $('x-contextmenu-code>x-menuitem').remove()
-    lista.forEach(e => {
-        var card = '  <x-menuitem data-function="false"  target="' + targetInput + '"  data-class="' + e.class + '" data-start="' + e.charStart + '" data-end="' + e.charEnd + '" data-type="' + e.type + '" data-name="' + e.name + '"><i style="background:' + e.iconBg + ' !important;" class="' + e.icon + '"></i>' + e.name + '</x-menuitem>'
+    newString.forEach(e => {
+        var card = '  <x-menuitem data-function="false"  data-class="' + e.class + '" data-start="' + e.charStart + '" data-end="' + e.charEnd + '" data-type="' + e.type + '" data-name="' + e.name + '"><i style="background:' + e.iconBg + ' !important;" class="' + e.icon + '"></i>' + e.name + '</x-menuitem>'
         $('x-contextmenu-code').append(card)
     })
-    if (lista.length > 0) {
-        $('x-contextmenu-code').css('display', 'block')
-    }
 
 }
 
+$(document).on('keyup', 'div[code-methods]', function(e) {
+    var code = (e.keyCode ? e.keyCode : e.which);
+    autoCompleteCodes($('div[code-methods]>x-input').val());
+})
+
+$(document).on('click', 'div[code-methods]>x-input>x-icon', function() {
+    $('div[code-methods]').fadeOut(100)
+})
+
+$(document).on('click', 'span[add_new_block]', function() {
+    $('div[code-methods]').fadeIn(100)
+    $('div[code-methods]>x-input').focus()
+})
 
 // FIM   .kotlin
 // FIM   .kotlin
 // FIM   .kotlin
-// FIM   .kotlin
+// FIM   .kotlin add_new_block
 // FIM   .kotlin
 // FIM   .kotlin
 
 function autocompleteView(e, lista, icon, targetInput) {
     var code = (e.keyCode ? e.keyCode : e.which);
     $('x-contextmenu-rocket').fadeOut()
-    console.log(lista)
+        //console.log(lista)
     $('x-contextmenu-view>x-menuitem').remove()
     lista.forEach(e => {
         var card = '  <x-menuitem target="' + targetInput + '" view-id="' + e.id + '" data-route="' + e.route + '" data-name="' + e.route + '"><i class="' + icon + '"></i>' + e.route + '</x-menuitem>'
         $('x-contextmenu-view').append(card)
     })
+
+    JSON.parse(getServices()).data
+        .forEach(e => {
+            var card = '  <x-menuitem class="is_external_service" target="' + targetInput + '" view-id="' + e.id + '" data-route="gateway/' + e.name + '" data-name="gateway/' + e.name + '"><i class="fas fa-plug"></i>gateway/' + e.name + '</x-menuitem>'
+            $('x-contextmenu-view').append(card)
+        })
+
+
     if (lista.length > 0) {
         $('x-contextmenu-view').css('display', 'block')
     }
@@ -2737,7 +3240,7 @@ function autocompleteView(e, lista, icon, targetInput) {
 function autocompleteRocket(e, lista, icon, targetInput) {
     var code = (e.keyCode ? e.keyCode : e.which);
 
-    console.log(lista)
+    //console.log(lista)
     $('x-contextmenu-rocket>x-menuitem').remove()
     lista.forEach(e => {
         var card = '  <x-menuitem target="' + targetInput + '" data-route="' + e.route + '"><i class="' + icon + '"></i>@' + e.route + '</x-menuitem>'
@@ -2781,13 +3284,13 @@ var cntrlIsPressed = false;
 $(document).keydown(function(e) {
     var key = undefined;
     var possible = [e.key, e.keyIdentifier, e.keyCode, e.which];
-    console.log(key)
+    //console.log(key)
     while (key === undefined && possible.length > 0) {
         key = possible.pop();
     }
 
     if (key && (key == '27')) {
-        $('x-contextmenu-code').fadeOut(100)
+        // $('x-contextmenu-code').fadeOut(100)
     }
 
     if (key && (key == '115' || key == '83') && (e.ctrlKey || e.metaKey) && !(e.altKey)) {
@@ -2800,13 +3303,17 @@ $(document).keydown(function(e) {
 
 function saveCtrlS() {
     if ($('back-shadow').css('display') == "block") {
-        $('#btnSaveCode').click()
+        saveFuncions(function(e) {
+
+        })
     } else {
-        updateButton()
+        updateButton(function(e) {
+
+        })
     }
 }
 
-function updateButton() {
+function updateButton(callback) {
 
     $('x-parent-box>div[shimmer-load]').fadeIn()
 
@@ -2814,33 +3321,29 @@ function updateButton() {
 
     $('x-body>x-button[componentcreated]').each(function(i, obj) {
         requestGet('get', '/components/?containerId=' + continerId + "&uid=" + $(obj).attr('id') + "&_sort=index:ASC", function(statusa, dataa) {
-            console.log(dataa)
+            //console.log(dataa)
             if (statusa) {
                 request('put', '/components/' + dataa[0].id, {
                     "params": JSON.parse($(obj).attr('data'))
                 }, function(status, data) {
-                    console.log(data)
+                    //console.log(data)
                     if (status) {
-                        $("#notification").animate({
-                            left: "100%"
-                        }).promise().done(function() {
-                            $("#notification").animate({
-                                'bottom': '-100px'
-                            }).promise().done(function() {
-                                $(this).attr('style', '')
-                            });
-                        });
                         saveTheme()
                         alerta("Container " + $('x-menuitem[container].selected').text() + " salvo com sucesso!")
                         $('x-body').fadeIn()
                         $('x-body').css('display', 'flow-root');
                         $('x-parent-box>div[shimmer-load]').fadeOut()
+                        callback(true)
+
                     } else {
                         alerta("Falha ao salvar Container!", true)
+                        callback(false)
                     }
                 })
             } else {
                 alerta("Falha ao salvar Container!", true)
+                callback(false)
+
             }
         })
 
@@ -2862,7 +3365,7 @@ $(document).on('keydown', 'x-layout-fase2>input', function(e) {
 function autocompleteFase2(e, lista, icon, targetInput) {
     var code = (e.keyCode ? e.keyCode : e.which);
 
-    console.log(lista)
+    //console.log(lista)
     $('x-contextmenu-fase2>x-menuitem').remove()
     lista.forEach(e => {
         var card = '  <x-menuitem target="' + targetInput + '" data-route="' + e.route + '"><i class="' + icon + '"></i>@' + e.route + '</x-menuitem>'
@@ -2913,8 +3416,8 @@ $(document).on('click', 'x-card[rocket] ', function() {
 
 function rendererDataBaseItens(route) {
     rocketNetwork('get', '/~/' + route, {}, function(status, data) {
-        console.log("A:" + status)
-        console.log("B:" + JSON.stringify(data))
+        //console.log("A:" + status)
+        //console.log("B:" + JSON.stringify(data))
         if (status) {
             $('x-rocker-opened').fadeIn(200)
             $('x-rocker-panel').animate({
@@ -3089,16 +3592,16 @@ function callServiveRocket(button) {
         }
     }
 
-    console.log(bodyData);
+    //console.log(bodyData);
 
-    console.log($('.mode-code').text());
+    //console.log($('.mode-code').text());
 
     if ($('div.back>back-body').hasClass('mode-code') && $('.mode-code').text().length > 3) {
         var obj = JSON.parse($('.mode-code').text())
         bodyData = obj
     }
 
-    console.log(bodyData);
+    //console.log(bodyData);
 
 
     rocketNetwork(methodRequest, '/' + $('label[x-add-rocker-col]').text(), bodyData, function(status, data) {
@@ -3169,6 +3672,54 @@ $(document).on('click', '.exIncludeButton', function(e) {
 
     jsonParseable.include = includeAble.replace('*,', '')
 
+    $('.mode-code').html(" ")
+    $('.mode-code').html(syntaxHighlight(JSON.stringify(jsonParseable, undefined, 4)))
+
+})
+
+$(document).on('click', '.exGroupButton', function(e) {
+    var json = $('.mode-code').text()
+    var jsonParseable = JSON.parse(json)
+    var includeAble = ""
+    $('x-card[database]>x-menuitem[class="db-field"]').each(function(index) {
+        if (index == $('x-card[database]>x-menuitem[class="db-field"]').length - 1 && includeAble == "") {
+            includeAble = $(this).text().trim()
+        }
+    })
+
+    jsonParseable.group = includeAble.replace('*,', '')
+
+    $('.mode-code').html(" ")
+    $('.mode-code').html(syntaxHighlight(JSON.stringify(jsonParseable, undefined, 4)))
+
+})
+
+
+$(document).on('click', '.exOrderButton', function(e) {
+    var json = $('.mode-code').text()
+    var jsonParseable = JSON.parse(json)
+    var includeAble = ""
+    $('x-card[database]>x-menuitem[class="db-field"]').each(function(index) {
+        if (index == $('x-card[database]>x-menuitem[class="db-field"]').length - 1 && includeAble == "") {
+            includeAble = $(this).text().trim()
+        }
+    })
+
+    jsonParseable.order = includeAble.replace('*,', '')
+
+    $('.mode-code').html(" ")
+    $('.mode-code').html(syntaxHighlight(JSON.stringify(jsonParseable, undefined, 4)))
+
+})
+
+$(document).on('click', '.exPaginationButton', function(e) {
+    var json = $('.mode-code').text()
+    var jsonParseable = JSON.parse(json)
+    var pagination = {
+        "rows": 10,
+        "page": 1
+    }
+    jsonParseable.pagination = pagination
     $('.mode-code').html(" ")
     $('.mode-code').html(syntaxHighlight(JSON.stringify(jsonParseable, undefined, 4)))
 
@@ -3247,7 +3798,7 @@ function initJsonBody() {
         }
     }
 
-    console.log(dataFilterAndOption);
+    //console.log(dataFilterAndOption);
     $('.mode-code').html(" ")
     $('.mode-code').html(syntaxHighlight(JSON.stringify(bodyData, undefined, 4)))
 }
@@ -3347,7 +3898,7 @@ $(document).on('click', 'x-menuitem[deleteCampo]', function(e) {
         '  "name": "' + $('x-input[namecampo]>label').text() + '"   }'
 
 
-    console.log(JSON.parse(campName))
+    //console.log(JSON.parse(campName))
     if (confirm("Tem certeza que deseja deletar a coluna " + $('x-input[namecampo]>label').text() + "?")) {
         rocketNetwork('PATCH', '/@SQL/delete-col', JSON.parse(campName), function(status, data) {
             if (data.success) {
@@ -3456,7 +4007,7 @@ $(document).on('click', 'x-button[button-nomecampo]', function(e) {
         $(this).removeClass("selected-collum")
         if ($('x-input[namecampo]').attr('data-mode') == "add") {
             var campName = '{ "' + $('x-input[namecampo]').val().toString().trim() + '": "String" }'
-            console.log(JSON.parse(campName))
+                //console.log(JSON.parse(campName))
             rocketNetwork('PUT', '/+' + $('label[x-add-rocker-col]').text().replace("@", ""), JSON.parse(campName), function(status, data) {
                 rendererDataBaseItens($('label[x-add-rocker-col]').text())
                 $('x-input[namecampo]').val("")
@@ -3471,7 +4022,7 @@ $(document).on('click', 'x-button[button-nomecampo]', function(e) {
                 '  "name": "' + $('x-input[namecampo]>label').text() + '",' +
                 '  "newName": "' + $('x-input[namecampo]').val().toString().trim() + '" }'
 
-            console.log(JSON.parse(campName))
+            //console.log(JSON.parse(campName))
 
             rocketNetwork('PATCH', '/@SQL/rename', JSON.parse(campName), function(status, data) {
                 rendererDataBaseItens($('label[x-add-rocker-col]').text())
@@ -3504,74 +4055,78 @@ function getTheme() {
             return d.id == parseInt(continerId);
         })
 
-        var myContainer = containerJson[0].json
-
-
-        var continerName = $('x-menuitem[container].x-menu-selected').find('x-label').text().trim()
-
-        $('.statusbar-title').text(continerName)
-
-
-        if (myContainer == null || myContainer == undefined || myContainer.text == null || myContainer.text == undefined) {
-
+        if (containerJson[0].json == undefined) {
+            openProject(getCurrentProjectData().id)
         } else {
 
-            $('.statusbar-title').text(myContainer.title)
-            $('x-actionbar').css('background', myContainer.primary)
-            $('x-statusbar').css('background', myContainer.secundary)
-            $('x-footerbar').css('background', myContainer.secundary)
-            $('x-body').attr('style', 'background-color:' + myContainer.background + " !important;")
-            $('x-actionbar>x-label').css('color', myContainer.text)
-            $('x-actionbar>i-icon').css('background', myContainer.text)
+            var myContainer = containerJson[0].json
 
-            $('x-button[gravity-change]').attr('mode', myContainer.gravity)
-            $('x-button[gravity-change]').find('strong').text(myContainer.gravity)
+            if (myContainer == null || myContainer == undefined || myContainer.text == null || myContainer.text == undefined) {
+
+            } else {
 
 
-            $('x-colorselect[target="color-primary"]').val(hex2rgba_convert(myContainer.primary))
-            $('x-colorselect[target="color-secundary"]').val(hex2rgba_convert(myContainer.secundary))
-            $('x-colorselect[target="color-accent"]').val(hex2rgba_convert(myContainer.accent))
-            $('x-colorselect[target="color-background"]').val(hex2rgba_convert(myContainer.background))
-            $('x-colorselect[target="color-text"]').val(hex2rgba_convert(myContainer.text))
+                var continerName = $('x-menuitem[container].x-menu-selected').find('x-label').text().trim()
 
-            $('#color-primary').val(myContainer.primary)
-            $('#color-secundary').val(myContainer.secundary)
-            $('#color-accent').val(myContainer.accent)
-            $('#config-title').val(myContainer.title)
-            $('#color-background').val(myContainer.background)
-            $('#color-text').val(myContainer.text)
+                $('.statusbar-title').text(continerName)
 
-            $('#config-radius').val(myContainer.radius)
-            $('#config-elevation').val(myContainer.elevation)
+                $('.statusbar-title').text(myContainer.title)
+                $('x-actionbar').css('background', myContainer.primary)
+                $('x-statusbar').css('background', myContainer.secundary)
+                $('x-footerbar').css('background', myContainer.secundary)
+                $('x-body').attr('style', 'background-color:' + myContainer.background + " !important;")
+                $('x-actionbar>x-label').css('color', myContainer.text)
+                $('x-actionbar>i-icon').css('background', myContainer.text)
 
-            var homeItem = getHomeData().filter(function(item) {
-                return item.id === parseInt($('x-menuitem[container].x-menu-selected').attr('data-id'))
-            })
-
-            if (homeItem.size > 0 && homeItem[0].isCard != null && homeItem[0].isCard) {
-                var css = 'height: ' + h + '; max-height: ' + h + '; min-height: ' + h + ';' +
-                    'width: ' + w + '; max-width: ' + w + '; min-width: ' + w + ';'
-                var style = document.createElement('style');
-                style.type = 'text/css';
-                style.innerHTML = 'x-parent-box[iscard]>x-body { ' + css + ' }';
-                document.getElementsByTagName('head')[0].appendChild(style);
-
-                $('x-parent-box').addClass('iscard')
-                $('x-parent-box').attr('iscard', true)
-
-                homeItem[0].cardSize
-
-                var w = cardSize.split("x")[0] + "% "
-                var h = cardSize.split("x")[1] + "% "
-
-                //   $('x-parent-box').attr('style',
-                //       'height: ' + h + '!important; max-height: ' + h + '!important; min-height: ' + h + '!important;' +
-                //     'width: ' + w + ' !important; max-width: ' + w + '!important; min-width: ' + w + '!important;')
+                $('x-button[gravity-change]').attr('mode', myContainer.gravity)
+                $('x-button[gravity-change]').find('strong').text(myContainer.gravity)
 
 
+                $('x-colorselect[target="color-primary"]').val(hex2rgba_convert(myContainer.primary))
+                $('x-colorselect[target="color-secundary"]').val(hex2rgba_convert(myContainer.secundary))
+                $('x-colorselect[target="color-accent"]').val(hex2rgba_convert(myContainer.accent))
+                $('x-colorselect[target="color-background"]').val(hex2rgba_convert(myContainer.background))
+                $('x-colorselect[target="color-text"]').val(hex2rgba_convert(myContainer.text))
+
+                $('#color-primary').val(myContainer.primary)
+                $('#color-secundary').val(myContainer.secundary)
+                $('#color-accent').val(myContainer.accent)
+                $('#config-title').val(myContainer.title)
+                $('#color-background').val(myContainer.background)
+                $('#color-text').val(myContainer.text)
+
+                $('#config-radius').val(myContainer.radius)
+                $('#config-elevation').val(myContainer.elevation)
+
+                var homeItem = getHomeData().filter(function(item) {
+                    return item.id === parseInt($('x-menuitem[container].x-menu-selected').attr('data-id'))
+                })
+
+                if (homeItem.size > 0 && homeItem[0].isCard != null && homeItem[0].isCard) {
+                    var css = 'height: ' + h + '; max-height: ' + h + '; min-height: ' + h + ';' +
+                        'width: ' + w + '; max-width: ' + w + '; min-width: ' + w + ';'
+                    var style = document.createElement('style');
+                    style.type = 'text/css';
+                    style.innerHTML = 'x-parent-box[iscard]>x-body { ' + css + ' }';
+                    document.getElementsByTagName('head')[0].appendChild(style);
+
+                    $('x-parent-box').addClass('iscard')
+                    $('x-parent-box').attr('iscard', true)
+
+                    homeItem[0].cardSize
+
+                    var w = cardSize.split("x")[0] + "% "
+                    var h = cardSize.split("x")[1] + "% "
+
+                    //   $('x-parent-box').attr('style',
+                    //       'height: ' + h + '!important; max-height: ' + h + '!important; min-height: ' + h + '!important;' +
+                    //     'width: ' + w + ' !important; max-width: ' + w + '!important; min-width: ' + w + '!important;')
+
+
+                }
             }
-        }
 
+        }
     }
 }
 
@@ -3591,8 +4146,8 @@ function newContainer() {
             "updated_at": "2019-12-12T00:46:45.897Z"
         }
         request('post', '/homes/', json, function(status, data) {
-            console.log("=================")
-            console.log(data)
+            //console.log("=================")
+            //console.log(data)
             if (status) {
                 openProject(getCurrentProjectData().id)
                 $('x-container-dialog').fadeOut(200)
@@ -3674,18 +4229,21 @@ function saveTheme() {
     request('put', '/homes/' + continerId, {
         "json": JSON.parse(theme)
     }, function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
-            document.documentElement.style.setProperty('--accent-color-blue', accent);
-
             var clientId = getUserData().user.id
-            requestGet('get', '/homes/?clientId=' + clientId, function(status, data) {
+            requestGet('get', '/homes/?clientId=' + clientId + "&projectId=" + getCurrentProjectData().id, function(status, data) {
                 if (status) {
                     var newData = []
                     data.forEach(element => {
                         element.containerId = element.id
                         newData.push(element)
                     })
+
+                    //console.log("HOME_DATA_AQUI " + newData)
+                    //console.log(newData)
+                    //console.log('/homes/?clientId=' + clientId + "/projectId=" + getCurrentProjectData().id)
+
                     setHomeData(newData)
                 }
             })
@@ -3753,7 +4311,7 @@ function rendererCard(cardSize) {
         height: h
     })
 
-    console.log(w + " " + h)
+    //console.log(w + " " + h)
 }
 
 
@@ -3787,13 +4345,13 @@ $(document).on('click', 'x-button[form-new-criar]', function(e) {
 })
 
 //x-project-item>.fa-trash-alt
+
 $(document).on('mouseenter', 'x-project-item', function(e) {
     $(this).find('.fa-trash-alt').css('display', 'block')
 })
 $(document).on('mouseleave', 'x-project-item', function(e) {
     $(this).find('.fa-trash-alt').css('display', 'none')
     $('x-project-item>p').removeAttr('contenteditable')
-
 })
 
 $(document).on('mouseenter', 'x-project-item>.fa-trash-alt', function(e) {
@@ -3803,7 +4361,6 @@ $(document).on('mouseenter', 'x-project-item>.fa-trash-alt', function(e) {
 $(document).on('mouseleave', 'x-project-item>.fa-trash-alt', function(e) {
     $(this).parent().removeAttr('style')
 })
-
 
 $(document).on('mouseenter', 'x-project-item>p', function(e) {
     $(this).attr('style', 'background: #2196f31c; border-radius: 5px;  border: 1px solid #2196f31c;')
@@ -3881,23 +4438,45 @@ function createProject() {
 
 
 $(document).on('click', 'x-project-item', function(e) {
+    $('div[project-load]').remove()
+    $(this).append('<div project-load><x-throbber project-load type="spin"></x-throbber></div>')
+    $(this).find('.fa-box').addClass("fa-box-open")
+    $(this).find('.fa-box').removeClass("fa-box")
+
     openProject($(this).attr('data-id'))
+})
+
+$(document).on('click', '#logoff-close-btn', function(e) {
+    logoff()
 })
 
 
 function openProject(projectId) {
+    $('x-menuitem[menu-bar-services-icon]').click()
+    closeFunctions()
+    getFonts()
+    getMenuFontIcons(function() {
+
+    })
+    autoCompleteCodes("%")
+
     if (getUserData().success == undefined) {
 
         var clientId = getUserData().user.id
-        console.log(clientId)
+            //console.log(clientId)
         requestGet('get', '/homes/?clientId=' + clientId + "&projectId=" + projectId, function(status, data) {
             if (status) {
+
                 $('.welcome').css('display', 'flex')
                 var newData = []
                 data.forEach(element => {
                     element.containerId = element.id
                     newData.push(element)
                 })
+
+                //console.log("HOME_DATA_AQUI ")
+                //console.log(newData)
+
                 setHomeData(newData)
                 initHome(newData)
                 $('x-project-select').fadeOut(100)
@@ -3908,48 +4487,30 @@ function openProject(projectId) {
 
                 setCurrentProjectData(current)
 
+                $('#qrcode-title').text(current.name)
                 $('.name-project-inmenu').text(current.name)
                 $('.name-project-inmenu2').text("ID: " + current.id)
 
                 trackDevices()
+
             } else {
                 logoff()
                 errorPulse()
                 alerta("Oops, falha ao carregar containers", true)
             }
+            $('div[project-load]').remove()
+
+            $(this).find('.fa-box').removeClass("fa-box-open")
+            $(this).find('.fa-box').addClass("fa-box")
+
         })
     } else {
+        $('div[project-load]').remove()
         logoff()
         alerta("Tente novamente!", true)
         return
     }
 }
-
-function listProject() {
-    dataRequest = {
-        name: $('div[form-new-card]>x-input').val(),
-        userId: getUserData().user.id
-    }
-
-    requestGet('get', '/projects?userId=' + getUserData().user.id, function(status, data) {
-        if (status) {
-            $('x-project-form-projects').html(" ")
-            setProjectData(data)
-            data.forEach(projetos => {
-                var item = '<x-project-item data-id="' + projetos.id + '">' +
-                    '<i  data-id="' + projetos.id + '" class="far fa-trash-alt"></i>' +
-                    '<i class="fas fa-box x-project-item-icon" aria-hidden="true"></i>' +
-                    '  <p  data-id="' + projetos.id + '"> ' + projetos.name + ' </p></x-project-item>'
-
-                $('x-project-form-projects').append(item)
-
-            })
-        } else {
-            alerta("Oops, falha ao tentar acessar projetos, tente novamente mais tarde...", true)
-        }
-    })
-}
-
 
 $(document).on('click', 'x-button[openqrcode]', function(e) {
     qrCodeRefresh()
@@ -3962,47 +4523,230 @@ $(document).on('click', '#gobackQrcode', function(e) {
 function qrCodeRefresh() {
     $('#qrcode').html("")
     var qrcode = new QRCode("qrcode");
-    var hashString = getCurrentProjectData().id + "|" + getCurrentProjectData().userId + "|" + getCurrentProjectData().name
+    var hashString =
+        getCurrentProjectData().id + "|" +
+        getCurrentProjectData().userId + "|" +
+        getCurrentProjectData().name + "|" +
+        $('.x-menu-selected').attr('data-id')
+
     var elText = GLOBAL_ENCRIPTA(hashString);
     qrcode.makeCode(elText);
     $('x-qr-code').css('display', 'flex')
 }
 
-$(document).on('click', 'x-project-form-title', function() {
+$(document).on('click', 'x-button[menubar-save]', function() {
+    saveCtrlS()
+})
+
+$(document).on('click', 'x-button[addconn]', function() {
+    $('x-connection').css('display', 'flex')
+    $('x-button[delconn]').css('display', 'none')
+})
+$(document).on('click', 'x-button[cancel_addconn]', function() {
+    $('x-connection').css('display', 'none')
+})
+
+$(document).on('click', 'x-button[save_addconn]', function() {
+    saveConnectionExternal()
+})
+
+
+$(document).on('click', 'x-button[delconn]', function() {
+    $('x-connection').css('display', 'none')
+    $('x-event-item[data-id="' + $(this).attr('data-id') + '"').fadeOut()
+    if (confirm("Tem certeza que deseja deletar esse item?")) {
+        rocketNetwork('delete', '/services/' + $(this).attr('data-id'), {}, function(status, data) {
+            if (data.success) {} else {
+                alerta("Oops, algo deu errado, check se os campos obrigatórios estão preenchidos corretamente...", true)
+            }
+        })
+    }
+})
+
+function clearConnCampos() {
+    $('x-input[connection_name]').val("")
+    $('x-input[connection_method]').val("")
+    $('x-input[connection_endpoint]').val("")
+    $('x-input[connection_headers]').val("")
+}
+
+function saveConnectionExternal() {
+    var name = $('x-input[connection_name]').val()
+    var method = $('x-input[connection_method]').val()
+    var endpoint = $('x-input[connection_endpoint]').val()
+    var headers = $('x-input[connection_headers]').val()
+    var private = $('x-connection-form>x-button>label[value]').attr("data-value")
+
+
+
+    //console.log(postData)
+    if (name.length > 0 && endpoint.length > 0 && method.length > 0) {
+        if (parseInt($('x-button[save_addconn]').attr('data-id')) > 0) {
+            var putData = {
+                "query": "name = '" + name + "', " + "endpoint = '" +
+                    endpoint + "', " + "method = '" + method + "', " + "headers = '" + headers + "'  "
+            }
+            rocketNetwork('put', '/services/' + $('x-button[save_addconn]').attr('data-id'), putData, function(status, data) {
+                if (data.success) {
+                    alerta("Yeah, conexão alterada com sucesso!")
+                    getExternalServices(function(success) {
+                        $('x-button[menubar-services]').find('x-throbber').css('display', 'none')
+                    });
+                    $('x-connection').css('display', 'none')
+                    clearConnCampos()
+                } else {
+                    alerta("Oops, algo deu errado, check se os campos obrigatórios estão preenchidos corretamente...", true)
+                }
+            })
+
+            $('x-event-item[data-id="' + $(this).attr('data-id') + '"').remove()
+            $('x-connection').css('display', 'none')
+            $('x-button[delconn]').css('display', 'block')
+        } else {
+            var postData = {
+                "name": name,
+                "endpoint": endpoint,
+                "method": method.toUpperCase(),
+                "userId": getUserData().user.id,
+                "projectId": getCurrentProjectData().id,
+                "headers": headers
+            }
+
+            $('x-button[delconn]').css('display', 'none')
+            rocketNetwork('post', '/services', postData, function(status, data) {
+                if (data.success) {
+                    alerta("Yeah, " + name + " integrado ao projeto com sucesso!")
+                    getExternalServices(function(success) {
+                        $('x-button[menubar-services]').find('x-throbber').css('display', 'none')
+                    });
+                    $('x-connection').css('display', 'none')
+                    clearConnCampos()
+                } else {
+                    alerta("Oops, algo deu errado, check se os campos obrigatórios estão preenchidos corretamente...", true)
+                }
+            })
+        }
+    } else {
+        alerta("Oops, algo deu errado, check se os campos obrigatórios estão preenchidos corretamente...", true)
+
+    }
+}
+
+$(document).on('click', 'x-menu>x-menuitem[private]', function() {
+    $('x-connection-form>x-button>label[value]').text("PRIVATE")
+})
+
+$(document).on('click', 'x-menu>x-menuitem[public]', function() {
+    $('x-connection-form>x-button>label[value]').text("PUBLIC")
+})
+
+$(document).on('click', 'x-menuitem[menu-bar-services-icon]', function() {
+    getExternalServices(function(success) {});
+})
+
+$(document).on('click', 'x-contextmenu-code>x-menuitem', function() {
+    var card = "<x-event-card data-name='" + $(this).attr("data-name") + "'>" +
+        $(this).attr("data-name") + "</x-event-card>"
+    $('div[event_block]').append(card)
+    $('div[code-methods]').fadeOut()
 
 })
 
-function trackDevices() {
-    var Promise = require('bluebird')
-    var adb = require('adbkit')
-    var client = adb.createClient()
 
-    client.trackDevices()
-        .then(function(tracker) {
-            tracker.on('add', function(device) {
-                console.log('Device %s was plugged in', device.id)
-                $('#deviceConnected').text(device.id)
-                $('#deviceConnected').css("color", "#ffffff")
-                $('#deviceConnectedIcon').css("color", "#FFFFFF")
-                alerta('Device <strong>' + device.id + '</strong>  foi <span style="color:green">conectado</span>')
-            })
-            tracker.on('remove', function(device) {
-                console.log('Device %s was unplugged', device.id)
-                $('#deviceConnected').text("desconetado")
-                $('#deviceConnected').css("color", "rgba(255, 255, 255, 0.3)")
-                $('#deviceConnectedIcon').css("color", "rgba(255, 255, 255, 0.3)")
-                alerta('Device <strong>' + device.id + '</strong> foi <span style="color:#541717">removido</span>')
-            })
-            tracker.on('end', function() {
-                console.log('Tracking stopped')
-                $('#deviceConnected').text("desconetado")
-                $('#deviceConnected').css("color", "rgba(255, 255, 255, 0.3)")
-                $('#deviceConnectedIcon').css("color", "rgba(255, 255, 255, 0.3)")
+//event_block
 
-                alerta('Device <strong>' + device.id + '</strong> foi <span style="color:#ff980033">desconectado</span>', true)
-            })
+
+$(document).on('click', 'x-button[menubar-services]', function() {
+    if (parseInt($('x-events').css('left')) < 0) {
+        $('x-button[menubar-services]').find('x-throbber').css('display', 'block')
+        $('x-events').animate({
+            left: '450px'
+        }, 100)
+        $('x-button[menubar-services]').find('x-throbber').css('display', 'none')
+        $('x-button[delconn]').css('display', 'none')
+        $('x-button[menubar-services]').addClass('menubar_selected')
+    } else {
+        $('x-events').animate({
+            left: '-450px'
+        }, 100)
+        $('x-button[menubar-services]').removeClass("menubar_selected")
+    }
+})
+
+$(document).on('click', 'x-event-item', function() {
+    var data = JSON.parse(GLOBAL_DECRIPTO($(this).attr('data')))
+
+    $('x-input[connection_name]').val(data.name)
+    $('x-input[connection_method]').val(data.method)
+    $('x-input[connection_endpoint]').val(data.endpoint)
+    $('x-input[connection_headers]').val(data.headers)
+    if (data.private == 1) {
+        $('x-connection-form>x-button>label[value]').val("PUBLIC")
+    } else {
+        $('x-connection-form>x-button>label[value]').val("PRIVATE")
+    }
+    $('x-connection-form>x-button>label[value]').attr("data-value", data.private)
+    $('x-connection').css('display', 'flex')
+    $('x-button[save_addconn]').attr('data-id', data.id)
+    $('x-button[delconn]').attr('data-id', data.id)
+})
+
+function getExternalServices(callback) {
+    $('x-body-events').html("")
+    rocketNetwork('get', '/services/' + getCurrentProjectData().id, {}, function(status, data) {
+        //console.log(data)
+        callback(true)
+        setServices(JSON.stringify(data))
+
+        JSON.parse(getServices()).data.forEach(element => {
+            var headers = element.headers;
+            var numberHeaders = "nenhum header"
+            if (headers.length > 0) {
+                if (headers.indexOf(",") != -1) {
+                    numberHeaders = headers.split(",").length + " headers"
+                } else {
+                    numberHeaders = "1 header"
+                }
+            }
+
+            var card = '<x-event-item data-id="' + element.id + '" data="' + GLOBAL_ENCRIPTA(JSON.stringify(element)) + '"><x-event-item-title>' +
+                element.name +
+                '</x-event-item-title>' +
+                ' <x-event-item-body> <x-event-action> <span ' + element.method + '> ' + element.method + '</span>' +
+                element.endpoint +
+                '</x-event-action>' +
+                '  <x-event-header> ' +
+                numberHeaders +
+                '</x-event-header>' +
+                '</x-event-item-body></x-event-item>'
+            $('x-body-events').append(card)
         })
-        .catch(function(err) {
-            console.error('Something went wrong:', err.stack)
-        })
+
+    })
+
+}
+
+function getFonts() {
+    const testFolder = "./scripts/fonts/";
+    const fs = require('fs');
+    $('x-menu[custom-fonts]').html("")
+    fs.readdir(testFolder, (err, files) => {
+
+        files.forEach(file => {
+            //console.log(file);
+
+            var newStyle = document.createElement('style');
+            newStyle.appendChild(document.createTextNode("\
+@font-face {\
+    font-family: " + file.split(".")[0] + ";\
+    src: url('" + testFolder + file + "') format('truetype');\
+}\
+"));
+
+            $('x-menu[custom-fonts]').append("<x-menuitem><label style='font-family:" + file.split(".")[0] + " !important;'>" + file.split(".")[0] + "</label></x-menuitem>")
+            document.head.appendChild(newStyle);
+
+        });
+
+    });
 }

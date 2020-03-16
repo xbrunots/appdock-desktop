@@ -1,0 +1,125 @@
+[
+
+    {
+        "id": 0,
+        "name": "ID",
+        "editable": false,
+        "value": "0",
+        "hint": "",
+        "response": "#0",
+        "type": "ID"
+    }, {
+        "id": 1,
+        "name": "NAME",
+        "editable": false,
+        "value": "NAME",
+        "hint": "",
+        "response": "NAME",
+        "type": "TEXT"
+    }, {
+        "id": 2,
+        "name": "TEXT",
+        "editable": true,
+        "value": "",
+        "hint": "digite algo aqui...",
+        "response": "",
+        "type": "TEXT"
+    }, {
+        "id": 3,
+        "name": "TEXT SIZE",
+        "editable": true,
+        "value": 16,
+        "hint": "",
+        "response": 16,
+        "type": "NUMBER"
+    }, {
+        "id": 4,
+        "name": "TEXT COLOR",
+        "editable": true,
+        "value": "#141414",
+        "hint": "",
+        "response": "#141414",
+        "type": "COLOR"
+    }, {
+        "id": 5,
+        "name": "FONT",
+        "editable": true,
+        "value": "",
+        "hint": "",
+        "response": "",
+        "type": "COLOR"
+    }, {
+        "id": 6,
+        "name": "BACKGROUND",
+        "editable": true,
+        "value": "#CCCCCC",
+        "hint": "",
+        "response": "#CCCCCC",
+        "type": "COLOR"
+    }, {
+        "id": 7,
+        "name": "SRC",
+        "editable": true,
+        "value": "default.png",
+        "style": "FULL",
+        "hint": "",
+        "response": "default.png",
+        "type": "SRC"
+    }, {
+        "id": 8,
+        "name": "SRC STYLE",
+        "editable": true,
+        "value": ["FULL", "NORMAL"],
+        "hint": "",
+        "response": "FULL",
+        "type": "OPTION"
+    }, {
+        "id": 9,
+        "name": "GRAVITY",
+        "editable": true,
+        "value": ["START", "CENTER", "END"],
+        "hint": "",
+        "response": "START",
+        "type": "OPTION"
+    }, {
+        "id": 10,
+        "name": "WIDTH SPACES",
+        "editable": true,
+        "value": ["1", "2", "3"],
+        "hint": "",
+        "response": "1",
+        "type": "OPTION"
+    }, {
+        "id": 11,
+        "name": "MARGIN LEFT",
+        "editable": true,
+        "value": 0,
+        "hint": "",
+        "response": 0,
+        "type": "NUMBER"
+    }, {
+        "id": 12,
+        "name": "MARGIN TOP",
+        "editable": true,
+        "value": 0,
+        "hint": "",
+        "response": 0,
+        "type": "NUMBER"
+    }, {
+        "id": 13,
+        "name": "MARGIN RIGHT",
+        "editable": true,
+        "value": 0,
+        "hint": "",
+        "response": 0,
+        "type": "NUMBER"
+    }, {
+        "id": 14,
+        "name": "MARGIN BOTTOM",
+        "editable": true,
+        "value": 0,
+        "hint": "",
+        "response": 0,
+        "type": "NUMBER"
+    }
+]

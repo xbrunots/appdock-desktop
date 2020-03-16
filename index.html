@@ -29,8 +29,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
     <script src="https://kit.fontawesome.com/54aaad6884.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css?family=Quicksand&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css?family=Quicksand|Bebas+Neue|Roboto|Quicksand:300,400&display=swap" rel="stylesheet">
     <script src="xel/xel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
     <script src="window.js"></script>
@@ -60,18 +59,119 @@
 
     <script src="scripts/script.js"></script>
     <script src="scripts/renderer.js"></script>
+    <script src="scripts/adbAndroid.js"></script>
 
 </head>
 
 <body>
-    <x-alerta>
-        <i class="far fa-envelope-open" aria-hidden="true" style="
+
+    <x-menu custom-fonts opened>
+        <x-menuitem>
+            <x-label>Copy</x-label>
+        </x-menuitem>
+    </x-menu>
+
+    <x-menu additem>
+
+    </x-menu>
+
+
+    <div icons-font>
+        <x-icon name="close" style="
+    color: white;
+    width: 32px;
+    height: 32px;
     position: absolute;
-    top: 11px;
-    left: 10px;
-    color: #ffffff17;
-    font-size: 12px;
-"></i>
+    top: 20px;
+    right: 20px;
+"></x-icon>
+        <x-input icons-filters role="input" aria-disabled="false" aria-readonly="false" style="
+position: absolute;
+top: 30px;
+border: none;
+background: #353535;
+border-radius: 4px;
+padding-left: 10px;
+padding-right: 10px;
+"><label style="
+padding: 0;
+margin: 0px;
+color: silver;
+text-transform: uppercase;
+font-size: 9px;
+text-shadow: none;
+letter-spacing: 1px;
+">Filtrar: <x-throbber loadfiltericon type="spin" style="     top: 4px; display: none; color: white;height: 22px;margin: 0px;position: absolute;"></x-throbber></label>
+
+        </x-input>
+        <x-menux contextmenu-icons></x-menux>
+    </div>
+    <x-connection>
+        <x-connection-body>
+            <x-connection-title>
+                ADD CONNECTION
+            </x-connection-title>
+            <x-connection-form>
+                <x-input connection_name>
+                    <label>*NAME:</label>
+                </x-input>
+                <x-input connection_method>
+                    <label>*METHOD:</label>
+
+                </x-input>
+                <x-input connection_endpoint>
+                    <label>*ENDPOINT:</label>
+                </x-input>
+                <x-input connection_headers>
+                    <label>HEADERS:</label>
+                    <x-label style="
+                    margin-left: 60px;;"> ex: key1:value1, key2:value2...</x-label>
+                </x-input>
+                <!--   <x-button connection_private>
+                    <label>PERMISSION:</label>
+                    <label value>PRIVATE</label>
+                    <x-menu>
+                        <x-menuitem private data-value="0">
+                            PRIVATE
+                        </x-menuitem>
+                        <x-menuitem public data-value="1">
+                            PUBLIC
+                        </x-menuitem>
+                    </x-menu>
+                </x-button> -->
+                <span>
+                    <x-button save_addconn  style="
+        font-size: 11px;
+        background: green;
+        color: white;
+        float: right;
+    ">SALVAR</x-button><x-button cancel_addconn style="
+        font-size: 11px;
+        background: #5f5f5f;
+        float: right;
+        margin-right: 5px;
+    ">CANCELAR</x-button><x-button delconn style="
+        font-size: 11px;
+        background: #d50000;
+        float: right;
+        margin-right: 5px;
+        color: white;
+     float: left;
+    "><i class="far fa-trash-alt"></i></x-button>
+                    </span>
+            </x-connection-form>
+        </x-connection-body>
+    </x-connection>
+
+    <x-alerta>
+        <img src="assets/logo_transparent.png" style="
+        position: absolute;
+        top: 5px;
+        left: 8px;
+        opacity: 0.3;
+        font-size: 12px;
+        width: 16px;
+    ">
 
         <x-icon name="close" style="
     position: absolute;
@@ -83,7 +183,7 @@
 "></x-icon>
 
         <x-alerta-title>
-            Mensagem do Sistema
+            APPDOCK
         </x-alerta-title>
         <x-alerta-msg>
             Device RM2839FF89 conectado!
@@ -96,9 +196,9 @@
 
 
             <x-project-form-title>
-                <p>Project Manager</p>
-                <!--     <i id="logoff-close-btn" class="fas fa-power-off" aria-hidden="true" style="
-                color: white;
+                <p>Boa tarde, acompanhe seus projetos abaixo </p>
+                <i tooltip-rox data-title="Voltar para tela de login/logoff" id="logoff-close-btn" class="fas fa-door-open" aria-hidden="true" style="
+                color: #ffffff3d;
                 font-size: 20px;
                 display: block;
                 width: 40px;
@@ -106,7 +206,8 @@
                 float: right;
                 margin-top: -47px;
                 cursor: pointer;
-            "></i>--></x-project-form-title>
+            "></i>
+            </x-project-form-title>
             <x-project-form-body>
                 <x-tabs style="
                 height: 5%;
@@ -147,20 +248,22 @@
 
     <x-qr-code>
         <div>
-            <x-label style="
+            <!--Abra o app AppDock Simulator para escanear e parear seu smartphone com o projeto...-->
+            <x-label id="qrcode-title" style="
             color: #ffffffc2;
             font-size: 20px;
             width: 300px;
             margin-bottom: 30px;
             text-align: center;
             text-shadow: 0 0 20px black;
-        ">Abra o app AppDock Simulator para escanear e parear seu smartphone com o projeto... </x-label>
+        "> Seu Código </x-label>
             <div id="qrcode"></div>
             <x-button id="gobackQrcode" role="button" aria-disabled="false" tabindex="0" style="
             /* margin: 20px; */
             width: 100%;
             background: #0b420d;
             color: white;
+     border-radius: 0px;
             float: right;
             margin-right: 0px;
             padding: 10px;
@@ -195,32 +298,27 @@
         </header>
         <x-contents>
             <x-label select_transation="" style="
-          position: absolute;
-          width: 200px !important;
-          right: 0px;
-          border: none !important;
-          color: #c0c0c054 !important;
-          display: flow-root;
-          text-align: center;
-          ">
+            position: absolute;
+            right: 0px;
+            border: none !important;
+            color: #c0c0c054 !important;
+            display: flow-root;
+            text-align: center;
+            z-index: 99;
+            ">
                 <input style="
-          color: #2196f35c !important;
-          text-align: right;
-          padding-right: 0px;
-          text-align: center;
-          width: auto;
-          padding-left: 0px;
-          /* border-left: 3px solid #2196F3; */
-          height: 35px;
-          margin-top: 5px;
-          margin-right: 10px; 
-          letter-spacing: 2px;
-          text-shadow: 0 0 15px black;
-          font-size: 13px;
-          border-radius: 100px;
-          box-shadow: 0 0 10px black;
-          border: 2px solid #2196f35c;
-      " disabled="" placeholder="...">
+            text-align: right;
+            padding-right: 0px;
+            text-align: center;
+            width: 100%;
+            padding-left: 0px;
+            /* border-left: 3px solid #2196F3; */
+            height: 35px;
+            margin-top: 5px;
+            margin-right: 10px;
+            letter-spacing: 2px;
+            font-size: 20px;
+        " disabled="" placeholder="...">
             </x-label>
             <x-label select_view> Service:<input placeholder="Comece a digitar para selecionar um serviço..."></input>
             </x-label>
@@ -844,10 +942,15 @@ CONSUMIR ROTAS AVANçADO 2
                     <i class="fas fa-plus"></i>
                 </x-card>
 
-                <!-- <x-card rocket data-id="1">
-          <x-label> Usuários</x-label>
-          <p>@USUARIO</p>
-        -->
+                <lottie-player rocket src="https://assets2.lottiefiles.com/datafiles/a3YH0ragZcwfKHS/data.json" background="transparent" speed="1" style="
+                 width: 300px;
+               height: 300px;
+               position: fixed;
+               left: 50%;
+               top: 50%;
+               margin-top: -150px;
+               margin-left: -150px;" loop autoplay>
+                </lottie-player>
 
             </x-panel>
         </x-card>
@@ -873,10 +976,16 @@ CONSUMIR ROTAS AVANçADO 2
                     <input id="labelNewContainer" />
                 </div>
                 <x-menuitem id="btnNewContainer" style="
-                margin-right: 30px;" class="button-azul" role="menuitem" aria-disabled="false" tabindex="0">
+                margin-right: 20px;" class="button-azul" role="menuitem" aria-disabled="false" tabindex="0">
                     <x-label>OK</x-label>
                 </x-menuitem>
                 </x-body>
+                <a href="https://store.appdock.io" target="_blank" style="
+                    margin: 19px;
+    display: block;
+            ">marketplace</a>
+
+
         </x-card>
     </x-container-dialog>
 
@@ -1071,29 +1180,29 @@ CONSUMIR ROTAS AVANçADO 2
             <!-- SIDEBAR LEFT-->
             <x-menu-vs>
                 <img class="x-menu-vs-img-active" style="margin-right: 4px;" src="./assets/logo_transparent.png">
+                <i x-menu-astronout class="fas fa-user-astronaut"></i>
+
                 <i x-menu-database class="fas fa-rocket"></i>
                 <i style="
                 margin-top: 0px;" x-menu-folder class="fas fa-folder"></i>
-                <x-button openqrcode role="button" aria-disabled="false" tabindex="0" style="
-                position: absolute;
-                bottom: 0px;
-                z-index: 999999999999;
-                width: 100%;
-                height: 76px;
-                align-items: center;
-                justify-content: center;
-                display: flex !important;
-                color: white;
-                margin-right: 5px;
-                background: transparent;
-            ">
-                    <x-label style="
-                    position: absolute;
-                    margin-top: -20px;
-                    font-size: 12px;
-                "> QR</x-label><i class="fas fa-qrcode" aria-hidden="true" style="
-                font-size: 20px;
-            "></i></x-button>
+
+
+                <x-button openqrcode="" role="button" aria-disabled="false" tabindex="0" style="
+position: absolute;
+bottom: 0px;
+z-index: 999999999999;
+width: 100%;
+height: 40px;
+align-items: center;
+justify-content: center;
+display: flex !important;
+color: white;
+margin-right: 5px;
+background: transparent;
+">
+                    <i class="fas fa-qrcode" aria-hidden="true" style="
+font-size: 20px;
+"></i></x-button>
             </x-menu-vs>
             <div class="resizable full-H sidebar-L col-xs-3 col-sm-3 col-md-3 col-lg-3">
 
@@ -1173,7 +1282,7 @@ CONSUMIR ROTAS AVANçADO 2
                                 <x-menuitem style="
                                 padding: 8px;
                             ">
-                                    <x-label>Exportar APK</x-label>
+                                    <x-label>Exportar Binário</x-label>
                                 </x-menuitem>
                                 <hr>
 
@@ -1213,26 +1322,25 @@ CONSUMIR ROTAS AVANçADO 2
 
                 <x-menu id="container-menu">
 
-                    <x-menuitem onclick="contextSelected(this)" action="transform_startup">
-                        <x-label>Startup</x-label>
+                    <x-menuitem onclick="contextSelected(this)" action="renomear">
+                        <x-label>Renomear</x-label>
                     </x-menuitem>
-
-                    <hr>
-
                     <x-menuitem onclick="contextSelected(this)" action="abrir">
                         <x-label>Abrir</x-label>
                     </x-menuitem>
 
-                    <x-menuitem onclick="contextSelected(this)" action="renomear">
-                        <x-label>Renomear</x-label>
+                    <hr>
+                    <x-menuitem onclick="contextSelected(this)" action="transform_startup">
+                        <x-label>Container Inicializador</x-label>
                     </x-menuitem>
+
 
                     <hr>
                     <x-menuitem onclick="contextSelected(this)" action="transform_card">
-                        <x-label>Converter em Card</x-label>
+                        <x-label>Usar como Card</x-label>
                     </x-menuitem>
                     <x-menuitem onclick="contextSelected(this)" action="transform_view">
-                        <x-label>Converter em View</x-label>
+                        <x-label>Usar como View</x-label>
                     </x-menuitem>
 
                     <hr>
@@ -1245,11 +1353,11 @@ CONSUMIR ROTAS AVANçADO 2
 
                 </x-containers-body>
 
-                <div style="display: flex;">
+                <!--   <div style="display: flex;">
                     <x-menuitem role="menuitem" target="#containers-rocket-data" altura="25%" class="expand_allbutton"> <i class="fas fa-chevron-right" aria-hidden="true" style="
                                        
                                     "></i></x-menuitem>
-                    <x-label target="addDataBase" class="label-item-title">SMART VIEWS </x-label>
+                             <x-label target="addDataBase" class="label-item-title">SMART VIEWS </x-label>
                     <x-menuitem id="addDataBase" class="btn_plus_default" style="
                                                       background: rgb(43, 43, 43) !important;
                                                       float: right;
@@ -1263,12 +1371,8 @@ CONSUMIR ROTAS AVANçADO 2
                                                                               margin: 0px !important;
                                                                           "></i>
                     </x-menuitem>
-                </div>
+                </div>-->
 
-
-                <x-containers-rocket-data id="containers-rocket-data" style="height: " 0px ", opacity: 0">
-
-                </x-containers-rocket-data>
             </div>
             <!-- SIDEBAR LEFT END-->
             <!-- SIDEBAR LEFT END-->
@@ -1289,23 +1393,68 @@ CONSUMIR ROTAS AVANçADO 2
                 <div class="row" style="
     display: flex;
 ">
-                    <x-doctabs style="
-                    padding-top: 3px;">
-                        <x-button style="
-                        font-size: 12px;
-                        color: white;
-                        background: black;
-                    ">
-                            <i id="deviceConnectedIcon" class="fas fa-mobile-alt" aria-hidden="true" style="
-                           font-size: 16px;color:rgba(255, 255, 255, 0.3);
-     margin-left: 4px;
-                    "></i>
-                            <x-label id="deviceConnected" style="  margin-left: 6px;
-                            "> </x-label>
-                        </x-button>
+                    <x-doctabs>
+
                         <!--<x-progressbar id="loading-footer" style="width: 80px; top: 50%; position: absolute; right: 20px; border-radius: 10px; margin-top: -3px; display: none;"></x-progressbar>
                         -->
 
+
+                        <x-button menubar-save>
+                            <i class="fas fa-check"></i>
+                            <x-label> Save </x-label>
+                        </x-button>
+
+                        <x-button menubar-theme>
+                            <i class="fas fa-swatchbook"></i>
+                            <x-label> Container Settings </x-label>
+                        </x-button>
+
+                        <x-button menubar-services>
+                            <x-throbber type="spin" style="  display: none; color: white;height: 22px;margin: 0px;position: absolute;"></x-throbber>
+                            <i class="fas fa-plug"></i>
+                            <x-label> Gateway </x-label>
+                        </x-button>
+
+                        <x-button menubar-run>
+                            <i class="fab fa-buffer"></i>
+                            <x-throbber type="spin" style="  display: none; color: white;height: 22px;margin: 0px;position: absolute;"></x-throbber>
+                            <x-label> Run Container </x-label>
+                        </x-button>
+                        <x-button menubar-saverun="" role="button" aria-disabled="false" tabindex="0" style="
+                     
+                        /* border-radius: 40px; */
+                        color: #4CAF50;
+                        font-weight: bold;
+                    ">
+                            <i class="fas fa-play" aria-hidden="true" style="
+                        color: #06d00e;
+                    "></i>
+                            <x-throbber type="spin" style="  display: none; color: white;height: 22px;margin: 0px;position: absolute;"></x-throbber>
+                            <x-label> Run Project </x-label>
+                        </x-button>
+
+                        <x-button deviceConnectedButton force-right>
+                            <i id="deviceConnectedIcon" class="fas fa-mobile-alt" aria-hidden="true" style="
+                           font-size: 16px;color:rgba(255, 255, 255, 0.3);
+                    "></i>
+                            <x-label id="deviceConnected" style="  
+                            "> </x-label>
+
+                            <x-menu menu_device_adb>
+                                <x-menuitem srcpy> <i class="fas fa-eye"></i>
+                                    <x-label>Presentation</x-label>
+                                </x-menuitem>
+                                <x-menuitem rec> <i class="fas fa-video"></i>
+                                    <x-label>Record</x-label>
+                                </x-menuitem>
+                            </x-menu>
+
+                        </x-button>
+
+                        <x-button force-right>
+                            <i class="fab fa-android"></i>
+                            <x-label> Deploy </x-label>
+                        </x-button>
                     </x-doctabs>
 
                     <x-button>
@@ -1314,7 +1463,6 @@ CONSUMIR ROTAS AVANçADO 2
                 </div>
                 <div class="row simulator">
                     <div class="sidebar-internal resizable3 row">
-
 
 
                         <div style="    display: flex;">
@@ -1343,30 +1491,25 @@ CONSUMIR ROTAS AVANçADO 2
 
 
                     </div>
-                    <x-button goEvents role="button" aria-disabled="false" tabindex="0">
-                        <i class="fas fa-plug" aria-hidden="true" style="
-                                  font-size: 13px;
-                              "></i>
-                    </x-button>
+
                     <div class="row" id="sidebar-bottom">
 
 
                         <back-shadow>
                             <functions>
+
                                 <fun-header>
 
                                     <x-codetabs>
                                         <!-- <x-menuitem>
                                 <i class="fas fa-scroll" aria-hidden="true"></i>
                                 <x-label>#Button12<x-label>
-                              </x-menuitem> -->
+                              </x-menuitem> x-codetabs>x-label>x-button[kobit] -->
                                     </x-codetabs>
-
                                     <x-label>
-                                        <i class="fas fa-scroll" aria-hidden="true"></i>
-                                        <x-button>Kobit Script Editor</x-button>
-                                        <x-contextmenu-code>
-                                        </x-contextmenu-code>
+                                        <x-button kobit> <i class="fas fa-scroll" style="margin-right:5px"></i> Kobit Script Editor</x-button>
+                                        <x-button logcat><i class="fas fa-bug" style="margin-right:5px"></i> Logcat</x-button>
+
                                     </x-label>
                                     <x-button close>
                                         <i class="fas fa-chevron-up" style="margin: 0px  !important;
@@ -1380,7 +1523,30 @@ CONSUMIR ROTAS AVANçADO 2
 
                                 </fun-header>
                                 <fun-body>
+                                    <span add_new_block>
+                                        <i class="fas fa-info"></i>
+                                     </span>
+                                    <div code-methods>
+                                        <x-input role="input" aria-disabled="false" aria-readonly="false" style="
+        border: none;
+        background: #909090;
+        width: 250px;
+        min-width: 250px;
+        color: black;
+         position: fixed;
+        margin-top: -27px;
+    ">
+                                            <x-icon name="close" style="
+        border: none;
+        width: 40px;
+        padding-right: 13px;
+    "></x-icon>
 
+                                        </x-input>
+
+                                        <x-contextmenu-code>
+                                        </x-contextmenu-code>
+                                    </div>
 
 
                                     <row fun>
@@ -1400,6 +1566,12 @@ CONSUMIR ROTAS AVANçADO 2
                                     </row>
 
                                 </fun-body>
+                                <fun-logcat>
+
+                                    <div event_block>
+
+                                    </div>
+                                </fun-logcat>
                                 <fun-historico>
                                     <fun-historico>
                             </functions>
@@ -1410,10 +1582,6 @@ CONSUMIR ROTAS AVANçADO 2
                     </div>
                     <x-simulator>
 
-
-                        <x-button x-settings-theme tooltip-rox data-title="Configurações do Container" data-position="bottom" target="x-simulator">
-                            <i style="margin-right: 5px;" class="fas fa-palette"></i> Container Settings
-                        </x-button>
                         <x-throbber type="spin" class="loadingItem"></x-throbber>
                         <div id="border-live">
                             <x-struct-option>
@@ -1425,47 +1593,23 @@ CONSUMIR ROTAS AVANçADO 2
                         <x-events>
                             <div style="
       display: flex;
+     height: 41px;
     position: relative;">
-                                <x-menuitem role="menuitem" aria-disabled="false" tabindex="0" class="expand_button">
-                                    <i class="fas fa-plug" aria-hidden="true" style="
-                           
-                        "></i></x-menuitem>
+
                                 <x-label style="
-        padding-left: 5px;" class="label-item-title">SERVICES</x-label>
+        padding-left: 5px;" class="label-item-title">Gateway</x-label>
+                                <x-menuitem menu-bar-services-icon role="menuitem" aria-disabled="false" tabindex="0" class="expand_button">
+                                    <i class="fas fa-sync"></i></x-menuitem>
                             </div>
-                            <x-button role="button" aria-disabled="false" tabindex="0" style="
+                            <x-button addconn style="
                             padding: 8px;
                             font-size: 10px;
                             background: transparent;
                             color: #ffffff54;
                             width: 100%;
                             box-shadow: none;
-                        "><i class="fas  fa-plus" style="margin-right: 5px;color: #ffffff54;" aria-hidden="true"></i> INTEGRAR </x-button>
+                        "><i class="fas  fa-plus" style="margin-right: 5px;color: #ffffff54;" aria-hidden="true"></i> ADD CONNECTION </x-button>
                             <x-body-events>
-                                <x-event-item>
-                                    <x-event-item-title>
-                                        <i class="fas fa-wifi" aria-hidden="true" style="
-margin-right: 5px;
-"></i>ConsultaCep</x-event-item-title>
-                                    <x-event-item-body>
-                                        <x-event-action style="
-padding-left: 20px;
-color: #3c763d;
-font-size: 12px;
-">
-                                            <div class="blobs-container" left="" style="
-margin: 7px;
-">
-                                                <div class="blob green"></div>
-                                            </div>Online</x-event-action>
-                                        <i class="fas fa-pause" aria-hidden="true" style="
-                                            float: right;
-                                            margin: 7px;
-                                            color: #732d2d;
-                                            cursor: pointer;
-                                        "></i> </x-event-item-body>
-                                </x-event-item>
-
                             </x-body-events>
                         </x-events>
 
@@ -1837,27 +1981,33 @@ margin: 7px;
         }
 
         function alerta(text, isError) {
-            $('x-alerta').animate({
-                "bottom": "-100px"
-            }, 100)
-
-            $('x-alerta-msg').html(text)
-            if (isError) {
-                $('x-alerta').css('border-left', '3px solid #d5000069')
-                $('x-alerta').css('background', '#211111')
-            } else {
-                $('x-alerta').css('border-left', '3px solid #2196F3')
-                $('x-alerta').css('background', '#000000')
-            }
-            $('x-alerta').animate({
-                "bottom": "0px"
-            }, 200)
-
-            $(document).on('click', 'x-alerta>x-icon', function() {
+            console.log($('x-alerta-msg').attr('data-text'))
+            console.log(text)
+            console.log($('x-alerta-msg').attr('data-text') != text)
+            if ($('x-alerta-msg').attr('data-text') != text) {
                 $('x-alerta').animate({
                     "bottom": "-100px"
+                }, 100)
+
+                $('x-alerta-msg').html(text)
+                $('x-alerta-msg').attr('data-text', text)
+                if (isError) {
+                    $('x-alerta').css('border-left', '3px solid #d5000069')
+                    $('x-alerta').css('background', '#211111')
+                } else {
+                    $('x-alerta').css('border-left', '3px solid #2196F3')
+                    $('x-alerta').css('background', '#000000')
+                }
+                $('x-alerta').animate({
+                    "bottom": "0px"
                 }, 200)
-            })
+
+                $(document).on('click', 'x-alerta>x-icon', function() {
+                    $('x-alerta').animate({
+                        "bottom": "-100px"
+                    }, 200)
+                })
+            }
         }
 
 

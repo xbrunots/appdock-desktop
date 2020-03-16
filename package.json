@@ -8,7 +8,8 @@
         "start": "electron app.js",
         "prod": "electron app.js",
         "dist": "electron-builder --linux snap",
-        "appimage": "electron-builder --linux appimage"
+        "appimage": "electron-builder --linux appimage",
+        "genwin": "electron-packager . Appdock --platform=win32 --arch=x64"
     },
     "devDependencies": {
         "electron": "^3.1.13",
@@ -18,7 +19,9 @@
     },
     "dependencies": {
         "@simonwep/pickr": "^1.4.7",
+        "@talaikis/logkitty": "^0.1.2",
         "adbkit": "^2.11.1",
+        "appium-adb": "^7.17.1",
         "asar": "^2.0.1",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
@@ -29,10 +32,12 @@
         "express": "^4.17.1",
         "firebase-admin": "^8.6.1",
         "firebase-functions": "0.7.0",
+        "fs-jetpack": "^2.2.3",
         "jade": "~1.11.0",
         "jsonwebtoken": "^8.2.1",
         "morgan": "^1.9.1",
         "mysql": "^2.17.1",
+        "nw-dialog": "^1.0.7",
         "papaparse": "^4.6.0",
         "qr-image": "^3.2.0",
         "serve-favicon": "~2.4.2",

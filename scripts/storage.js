@@ -120,8 +120,19 @@
      return decrypt(retrievedObject);
  }
 
+
+ function setServices(o) {
+     localStorage.setItem('external-service-json', encrypt(o));
+ }
+
+ function getServices() {
+     var retrievedObject = localStorage.getItem('external-service-json');
+     return decrypt(retrievedObject);
+ }
+
  function setRocketData(o) {
      localStorage.setItem('RocketData-json', encrypt(o));
+
  }
 
  function getRocketData() {

@@ -1,4 +1,9 @@
 $(document).on('click', '.x-menu-container', function() {
+
+    if (notSaved) {
+        saveCtrlS()
+    }
+
     $('x-body').css('display', 'none')
     if ($('.crenamed').css('display') == 'none') {
         $('.welcome').fadeOut();
@@ -17,6 +22,9 @@ $(document).on('click', '.x-menu-container', function() {
     hideAttributes()
 });
 
+function notSaved() {
+    return false
+}
 
 function selectProjectAndTab(id) {
     $('x-parent-box').css('display', 'block')
@@ -28,7 +36,7 @@ function selectProjectAndTab(id) {
 }
 
 $(document).on('contextmenu', '.x-menu-container', function(e) {
-    console.log($(this))
+    //console.log($(this))
     var posX = e.pageX - 50
     var posY = $(this).position().top;
 
@@ -66,7 +74,7 @@ function contextSelected(element) {
         var x = event.clientX; // Get the horizontal coordinate
         var y = event.clientY;
         $('.crenamed').attr('style',
-            'left:0px; top:' + (parseInt(y) - 40) + 'px;'
+            'left:0px; top:' + (parseInt(y) - 10) + 'px;'
         )
         $('.crenamed').fadeIn(100)
         $('.crenamed').find('input').val("")
@@ -97,6 +105,8 @@ function contextSelected(element) {
                     ' width: 8px;' +
                     '  position: absolute;' +
                     '  left: 5px; ">  </i>')
+                $('i[startupcontainer]').attr('tooltip-rox', 'true')
+                $('i[startupcontainer]').attr('data-title', 'O container ' + id + ' está definido como StartupContainer e será aberto automaticamente ao iniciar o aplicativo...')
             } else {
                 alerta("Oops, algo deu errado, tente novamente...", true)
             }
@@ -133,7 +143,7 @@ function contextSelected(element) {
         $('x-layouts-view').fadeIn(100);
 
         if (lista[0].cardSize != undefined && lista[0].cardSize.length > 2) {
-            console.log('x-layout-selector>x-menuitem[data-size="' + lista[0].cardSize + '"]')
+            //console.log('x-layout-selector>x-menuitem[data-size="' + lista[0].cardSize + '"]')
             $('x-layout-selector>x-menuitem').removeClass('LayoutSelectorSelected')
             $('x-layout-selector>x-menuitem[data-size="' + lista.cardSize + '"]').addClass('LayoutSelectorSelected')
 
@@ -141,7 +151,7 @@ function contextSelected(element) {
         }
 
     } else if (action == "transform_view") {
-        console.log("CARD")
+        //console.log("CARD")
         request('put', '/homes/' + $('#container-menu').attr('data-id'), {
                 "isCard": false
             },
@@ -152,6 +162,10 @@ function contextSelected(element) {
                     newCard.filter(function(item) {
                         return item.id === parseInt($('#container-menu').attr('data-id'))
                     })[0].isCard = false
+
+                    //console.log("HOME_DATA_AQUI " + newCard)
+                    //console.log(newCard)
+
                     setHomeData(newCard)
                     initHome(newCard)
                     $('#container' + $('#container-menu').attr('data-id')).find('i').remove()
@@ -181,6 +195,10 @@ $(document).on('click', '#btnSaveFase3', function(e) {
                 newCard.filter(function(item) {
                     return item.id === parseInt($('#container-menu').attr('data-id'))
                 })[0].cardSize = $('.LayoutSelectorSelected').attr('data-size').trim()
+
+                //console.log("HOME_DATA_AQUI " + newCard)
+                //console.log(newCard)
+
                 setHomeData(newCard)
                 initHome(newCard)
                 $('#container' + $('#container-menu').attr('data-id')).attr("iscard", "true")
@@ -198,7 +216,7 @@ $(document).on('click', '#btnSaveFase3', function(e) {
 
 $(document).on('keydown', '.crenamed > input', function(e) {
     var code = (e.keyCode ? e.keyCode : e.which);
-    console.log(code)
+    //console.log(code)
     if (code == 13) {
         renameContainer($(this).attr('data-id'), $(this).val())
     } else if (code == 27) {
@@ -209,12 +227,12 @@ $(document).on('keydown', '.crenamed > input', function(e) {
 });
 
 function renameContainer(containerId, newAlias) {
-    console.log(containerId)
-    console.log(newAlias)
+    //console.log(containerId)
+    //console.log(newAlias)
     request('put', '/homes/' + containerId, {
         "alias": newAlias
     }, function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
             $('#container-menu').removeClass('context-menu-show')
             $('.x-menu-container').find('x-label').css('display', 'block')
@@ -237,9 +255,9 @@ function openComponents(containerId) {
 
     requestGet('get', '/components?containerId=' + containerId + "&_sort=index:ASC", function(status, data) {
 
-        console.log("***************************")
-        console.log(data)
-        console.log("***************************")
+        //console.log("***************************")
+        //console.log(data)
+        //console.log("***************************")
 
         if (status) {
             setCurrentComponent(data)
@@ -262,7 +280,7 @@ function openComponents(containerId) {
 
 function rendererFiles() {
     requestGet('get', '/files?clientId=' + getUserData().user.id, function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
             setFiles(data)
         } else {
@@ -272,14 +290,14 @@ function rendererFiles() {
 }
 
 function addStructToList(q) {
-    console.log("LALALALAL")
-    console.log(q)
-    console.log("LALALALAL")
+    //console.log("LALALALAL")
+    //console.log(q)
+    //console.log("LALALALAL")
     $('x-menuitem[estruct]').remove()
     $('x-button[componentcreated]').remove()
     q.forEach(element => {
 
-        console.log(element)
+        //console.log(element)
         var names = ""
 
         if (element.params[2].value.trim().length > 1) {
@@ -291,24 +309,23 @@ function addStructToList(q) {
             "  <x-label> " + element.name + " </x-label> " + names +
             "  </x-menuitem>"
         $('.sidebar-internal').find('.body').find('structs-body').append(item)
-        elementGet(JSON.stringify(element.params), element.name, element.name)
+        elementGet('x-body', JSON.stringify(element.params), element.name, element.name)
         rendererComponent($('#' + element.name), false)
     });
 }
 
 function initHome(data) {
-    console.log("initHome")
+    //console.log("initHome")
     $('x-menuitem[container]').remove()
     var tsCalc = 0
     var tsCalcId = 0
     data.forEach(element => {
-        console.log(element)
+        //console.log(element)
         var icon = ' <x-icon name = "dashboard"> </x-icon> '
         var isCard = ""
         if (element.isCard != null && element.isCard == true) {
             icon = '<i style=" margin-right: 6px;" class="fas fa-dolly-flatbed" aria-hidden="true"></i>'
             isCard = "iscard"
-            console.log("IS CARD HERE")
         }
 
         var label = '<label style=" margin: 0px;  font-size: 10px;     font-weight: 100;  color: #c0c0c094;">ID: ' + element.id + '</label>'
@@ -330,21 +347,32 @@ function initHome(data) {
         ' width: 8px;' +
         '  position: absolute;' +
         '  left: 5px; ">  </i>')
+    $('i[startupcontainer]').attr('tooltip-rox', 'true')
+    $('i[startupcontainer]').attr('data-title', 'O container ' + tsCalcId + ' está definido como StartupContainer e será aberto automaticamente ao iniciar o aplicativo...')
 
 }
 
 function addComponentToList() {
     requestGet('get', '/objects', function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
             setObjects(data)
             $('x-menuitem[components]').remove()
+            $('x-menuitem[addcomponents]').remove()
             data.forEach(element => {
                 var item = '<x-menuitem   itemid="it' + element.name + '"  components data-type="' + element.name + '">' +
                     ' <i class="' + element.icon + '"></i>   ' +
                     '  <x-label> ' + element.name + ' </x-label> ' +
                     '  </x-menuitem>'
+
+                var item2 = '<x-menuitem   itemid="it' + element.name + '"  addcomponents data-type="' + element.name + '">' +
+                    ' <i class="' + element.icon + '"></i>   ' +
+                    '  <x-label> ' + element.name + ' </x-label> ' +
+                    '  </x-menuitem>'
+
                 $('.sidebar-internal').find('.header').append(item)
+                $('x-menu[additem]').append(item2)
+
             });
         } else {
             alerta("Erro ao tentar sincronizar seus <strong>objects</strong>", true)
@@ -355,16 +383,16 @@ function addComponentToList() {
 $('.type-color').click(function() {
 
     pickr.on('init', instance => {
-        console.log('init', instance);
+        //console.log('init', instance);
     }).on('show', (color, instance) => {
-        console.log('show', color, instance);
+        //console.log('show', color, instance);
     });
 
 })
 
 function addAttributes() {
     requestGet('get', '/attributes', function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
             rendererAttr(data)
         } else {
@@ -468,8 +496,8 @@ function rendererAttr(data) {
 
 $(document).on('keydown', '#menu-file-select > x-input', function(e) {
     var parentId = $('#menu-file-select').attr('data-id')
-    console.log("ID: ")
-    console.log($(this))
+        //console.log("ID: ")
+        //console.log($(this))
     var code = (e.keyCode ? e.keyCode : e.which);
     if (code == 13) {
         $("#" + parentId).val($('#menu-file-select').children().eq(1).text())
@@ -511,13 +539,13 @@ $(document).on('keydown', '#menu-file-select > x-input', function(e) {
 
 $(document).on('click', '#menu-file-select > x-menuitem', function() {
     if ($(this).text().trim() != "REMOVER IMAGEM") {
-        console.log($(this).text())
+        //console.log($(this).text())
         var parentId = "#" + $(this).attr('data-parent')
 
         $(parentId).val($(this).text())
 
     } else {
-        console.log("NAOO")
+        //console.log("NAOO")
         $(parentId).val('null')
     }
     $('#menu-file-select').fadeOut(100)
@@ -590,7 +618,7 @@ function renameFile(id, newName) {
     request('put', '/files/' + id, {
         "alias": newName
     }, function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
             alerta(" renomeado como <strong>" + newName + "</strong> ")
             $('x-menuitem[data-id="' + id + '"]').attr('data-alias', newName + id)
@@ -608,7 +636,7 @@ function renameFile(id, newName) {
 
 function deleteFile(id) {
     request('delete', '/files/' + id, function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
             $('x-menuitem[data-id="' + id + '"]').fadeOut()
             $('#popmenu-find').animate({
@@ -633,7 +661,7 @@ function savePictureInDataBase(foto, alias) {
     }
 
     request('post', '/files', data, function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
             openFiles()
         } else {
@@ -661,7 +689,7 @@ $(document).on('click', 'x-box[data-type="OPTION"]', function(e) {
 
     $('#context-attribute').find('x-menuitem').remove()
 
-    console.log($(this).attr('data-list'))
+    //console.log($(this).attr('data-list'))
 
     $(this).attr('data-list').split(',').forEach(element => {
         var item = ' <x-menuitem onclick="attribSelected(this, ' + $(this).attr('data-id') + ')" type="OPTION">' +
@@ -698,7 +726,7 @@ function rgba2hex(orig) {
 
 function xColorSelectChange(item, id) {
     var cor = $('#attr' + id).attr('value')
-    console.log(rgba2hex(cor))
+        //console.log(rgba2hex(cor))
     $('#attr' + id).find('span').html(rgba2hex(cor))
 }
 
@@ -814,12 +842,12 @@ $(document).on('click', 'ul[x-files]>x-menuitem', function() {
 
 function openFiles() {
     requestGet('get', '/files?clientId=' + getUserData().user.id, function(status, data) {
-        console.log(data)
+        //console.log(data)
         if (status) {
             setFiles(data)
             $('x-menuitem[fileItem]').remove()
             data.forEach(element => {
-                //    console.log(element)
+                //    //console.log(element)
                 var item = '<x-menuitem fileItem data-id="' + element.id + '" data-alias="' + element.alias + "-" + element.id + '"  onclick="onFileClick(' + element + ')" >' +
                     ' <x-label> </x-label> ' +
                     '<img src="assets/bg.jpg" />' +
